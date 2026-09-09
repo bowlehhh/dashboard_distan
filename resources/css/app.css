@@ -848,8 +848,45 @@ body.public-directory{display:block;min-height:0;padding:0!important}
     margin-top:auto;
 }
 
+/* Empty directories still occupy the available viewport height, keeping the footer at the bottom. */
+.public-directory-shell--empty > main{
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+}
+.public-directory-shell--empty .directory-content{
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+}
+
+/* Reserve room for the decorative trail before the normal, scrollable footer. */
+@media(min-width:601px){
+    .public-directory-shell--empty .directory-content{
+        padding-bottom:240px;
+    }
+}
+
 /* Keep the decorative ring inside the content box so it cannot extend the document below the footer. */
 .public-directory-shell .directory-content::after{bottom:0}
+
+/*
+ * The public header must stay in the document flow.  Previously it was
+ * absolutely positioned on desktop, so short (empty) directories could make
+ * the navigation appear detached above the hero at browser zoom levels.
+ */
+@media(min-width:1025px){
+    .public-directory-shell > .directory-header{
+        position:relative;
+        z-index:5;
+        background:linear-gradient(100deg,#043706 0%,#075818 55%,#0e7828 100%);
+    }
+
+    .public-directory .directory-hero{
+        padding-top:74px;
+    }
+}
 
 /* Keep the public navigation consistent on phones, tablets, and iPad landscape. */
 .landing-menu-close,.landing-menu-backdrop{display:none}

@@ -171,7 +171,6 @@ document.addEventListener('keydown', (event) => {
 
 const pageLoader = document.querySelector('[data-page-loader]');
 let loaderHideTimer = null;
-let isNavigating = false;
 let loaderFallbackTimer = null;
 
 const hidePageLoader = () => {
@@ -179,7 +178,6 @@ const hidePageLoader = () => {
         return;
     }
 
-    isNavigating = false;
     window.clearTimeout(loaderFallbackTimer);
     pageLoader.classList.remove('is-visible');
     pageLoader.setAttribute('aria-hidden', 'true');
@@ -206,49 +204,12 @@ const showEntryLoader = () => {
     window.setTimeout(hidePageLoader, 900);
 };
 
-if (document.body.dataset.entryLoader === 'true') {
+const loaderReason = document.body.dataset.loaderReason;
+const initialLoaderStorageKey = 'simantap.initial-loader-shown';
+
+if (loaderReason === 'initial' && ! window.sessionStorage.getItem(initialLoaderStorageKey)) {
+    window.sessionStorage.setItem(initialLoaderStorageKey, 'true');
+    showEntryLoader();
+} else if (loaderReason === 'login' || loaderReason === 'logout') {
     showEntryLoader();
 }
-
-document.querySelector('[data-login-form]')?.addEventListener('submit', () => {
-    isNavigating = true;
-    showPageLoader();
-});
-
-document.addEventListener('click', (event) => {
-    const link = event.target.closest('a[href]');
-
-    if (! link || link.target === '_blank' || link.hasAttribute('download') || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-        return;
-    }
-
-    const destination = new URL(link.href, window.location.href);
-
-    if (destination.origin !== window.location.origin || destination.pathname === window.location.pathname && destination.search === window.location.search || destination.hash && destination.pathname === window.location.pathname) {
-        return;
-    }
-
-    if (! pageLoader) {
-        return;
-    }
-
-    if (document.body.classList.contains('app-body')) {
-        return;
-    }
-
-    event.preventDefault();
-
-    if (isNavigating) {
-        return;
-    }
-
-    isNavigating = true;
-    showPageLoader();
-    window.location.assign(destination.href);
-});
-
-window.addEventListener('pageshow', () => {
-    if (isNavigating) {
-        hidePageLoader();
-    }
-});

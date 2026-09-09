@@ -21,6 +21,7 @@ class SimantapAccessTest extends TestCase
         $response = $this->actingAs($user)->post(route('logout'));
 
         $response->assertRedirect(route('home'));
+        $response->assertSessionHas('page_loader', 'logout');
 
         $this->assertGuest();
     }

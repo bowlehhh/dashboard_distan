@@ -33,7 +33,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
         $user->forceFill(['last_login_at' => now()])->save();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('dashboard'))->with('page_loader', 'login');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -42,7 +42,9 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home')->with('success', 'Anda telah keluar dari SIMANTAP.');
+        return redirect()->route('home')
+            ->with('success', 'Anda telah keluar dari SIMANTAP.')
+            ->with('page_loader', 'logout');
     }
 
     public function forgot(): View

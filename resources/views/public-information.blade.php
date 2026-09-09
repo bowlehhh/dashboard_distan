@@ -9,7 +9,7 @@
 <body class="public-directory" data-entry-loader="true">
     <x-page-loader />
 
-    <div class="public-directory-shell">
+    <div class="public-directory-shell {{ count($rows) === 0 ? 'public-directory-shell--empty' : '' }}">
     <header class="directory-header">
         <a class="directory-brand" href="{{ route('home') }}" aria-label="SIMANTAP, halaman utama">
             <img src="{{ asset('images/simantap-logo-reference.png') }}" alt="SIMANTAP — Sistem Informasi Alsintan Terpadu, Modern, dan Transparan">

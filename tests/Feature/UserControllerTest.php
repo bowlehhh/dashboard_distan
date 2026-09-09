@@ -29,7 +29,9 @@ class UserControllerTest extends TestCase
         $this->post(route('login.store'), [
             'email' => 'operator.baru@example.test',
             'password' => 'password-baru',
-        ])->assertRedirect(route('dashboard'));
+        ])
+            ->assertRedirect(route('dashboard'))
+            ->assertSessionHas('page_loader', 'login');
         $this->assertAuthenticatedAs($user);
     }
 

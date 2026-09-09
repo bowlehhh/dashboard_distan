@@ -28,7 +28,8 @@ class PublicInformationPagesTest extends TestCase
     {
         $response = $this->get(route('public.poktans'));
 
-        $response->assertSee('Data Kelompok Tani');
+        $response->assertSee('Data Kelompok Tani')
+            ->assertSee('public-directory-shell--empty');
     }
 
     public function test_public_alsintan_page_paginates_rows_without_authentication(): void
