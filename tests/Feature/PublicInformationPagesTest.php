@@ -73,7 +73,8 @@ class PublicInformationPagesTest extends TestCase
     {
         $response = $this->get(route('public.reports'));
 
-        $response->assertSee('Laporan Pertanian');
+        $response->assertSee('Laporan Pertanian')
+            ->assertSee('public-directory-shell--empty');
     }
 
     private function seedAlsintans(int $count): void
