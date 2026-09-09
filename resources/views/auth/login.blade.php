@@ -6,7 +6,8 @@
     <title>Masuk · SIMANTAP</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="auth-page">
+<body class="auth-page" data-entry-loader="true">
+    <x-page-loader />
     <main class="auth-shell">
         <section class="auth-visual">
             <div class="auth-pattern" aria-hidden="true">

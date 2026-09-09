@@ -6,7 +6,7 @@
     <title>{{ $title }} · SIMANTAP</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="public-directory">
+<body class="public-directory" data-entry-loader="true">
     <x-page-loader />
 
     <div class="public-directory-shell">

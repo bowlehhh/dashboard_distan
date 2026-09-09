@@ -6,7 +6,7 @@
     <title>SIMANTAP · Dinas Pertanian Kutai Barat</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="public public-home">
+<body class="public public-home" data-entry-loader="true">
     <x-page-loader />
     <main class="landing-shell">
         @if(session('success'))

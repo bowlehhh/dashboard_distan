@@ -1,6 +1,3 @@
-<div>
-    <!-- An unexamined life is not worth living. - Socrates -->
-</div>
 <div class="page-loader" data-page-loader hidden aria-hidden="true">
     <div class="page-loader__glow" aria-hidden="true"></div>
     <div class="page-loader__content" role="status" aria-live="polite">

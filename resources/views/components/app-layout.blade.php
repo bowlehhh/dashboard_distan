@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="id">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ $title }} · SIMANTAP</title>@vite(['resources/css/app.css', 'resources/js/app.js'])</head>
-<body class="app-body app-density-{{ $appearanceSettings['density'] ?? 'comfortable' }}" data-entry-loader="{{ request()->routeIs('dashboard', 'users.*') ? 'true' : 'false' }}">
+<body class="app-body app-density-{{ $appearanceSettings['density'] ?? 'comfortable' }}" data-entry-loader="true">
 <x-page-loader />
 <div class="app-shell">
     <aside class="sidebar" data-sidebar>

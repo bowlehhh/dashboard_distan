@@ -20,17 +20,24 @@ Gunakan nilai `SIMANTAP_ADMIN_EMAIL` dan `SIMANTAP_ADMIN_PASSWORD` pada `.env` u
 
 1. Siapkan PHP 8.3+, ekstensi `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`, `xml`, `curl`, dan `zip`, lalu buat database produksi.
 2. Isi `.env` produksi dengan `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` yang benar, kredensial database, `FILESYSTEM_DISK=public`, SMTP yang aktif, serta password admin yang kuat.
-3. Jalankan perintah berikut dari root aplikasi:
+3. Setelah kode terbaru sudah berada di server, jalankan `bash deploy.sh` dari root aplikasi. Skrip ini memasang dependency produksi, menghapus cache lama, menjalankan migrasi, membangun aset Vite baru, lalu mengaktifkan kembali aplikasi.
+
+   Skrip tidak menjalankan seeder supaya data produksi dan akun admin tidak tertimpa. Jangan menjalankan `php artisan db:seed --force` pada deploy rutin.
+
+   Jika tidak menggunakan skrip, jalankan urutan berikut dari root aplikasi:
 
 ```bash
 composer install --no-dev --prefer-dist --optimize-autoloader
+php artisan optimize:clear
+php artisan migrate --force
+php artisan storage:link --force
 npm ci
 npm run build
-php artisan migrate --force
-php artisan db:seed --force
-php artisan storage:link
-php artisan optimize
+php artisan config:cache
+php artisan view:cache
 ```
+
+`public/build` tidak disimpan di repository. Karena itu `npm ci` dan `npm run build` wajib dijalankan pada setiap deploy agar server tidak memuat CSS/JavaScript versi lama. Aplikasi ini memakai route closure, jadi jangan menjalankan `php artisan route:cache`.
 
 Document root web server harus diarahkan ke direktori `public`, bukan root repository. Pastikan `storage` dan `bootstrap/cache` dapat ditulis oleh user web server. Jika memakai queue database, jalankan worker yang dikelola Supervisor/systemd. Jangan gunakan `MAIL_MAILER=log` di produksi jika fitur reset password harus mengirim email.
 
