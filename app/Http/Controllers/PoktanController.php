@@ -18,7 +18,7 @@ class PoktanController extends Controller
             ->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('name', 'like', "%{$search}%")->orWhere('chairperson', 'like', "%{$search}%")))
             ->when($request->district, fn ($query, $district) => $query->where('district', $district))
             ->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))
-            ->when($request->status, fn ($query, $status) => $query->where('status', $status))->latest()->paginate(10)->withQueryString();
+            ->when($request->status, fn ($query, $status) => $query->where('status', $status))->latest()->paginate(100)->withQueryString();
 
         return view('poktans.index', compact('poktans'));
     }

@@ -55,6 +55,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::resource('saprodis', SaprodiController::class);
         Route::resource('crops', CropController::class);
         Route::get('/laporan', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/laporan/{report}/ekspor', [ReportController::class, 'download'])->whereIn('report', ['alsintan', 'saprodi', 'tanaman-pangan', 'poktan'])->name('reports.download');
     });
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class);

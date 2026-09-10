@@ -68,7 +68,7 @@
                 <div class="directory-table-column">
                     <div class="directory-table-stage">
                         <div class="directory-table-art directory-table-art--left" aria-hidden="true">
-                            @for ($artIndex = 0; $artIndex < 5; $artIndex++)
+                            @for ($artIndex = 0; $artIndex < 2; $artIndex++)
                                 <span class="directory-table-art__item directory-table-art__item--sprout">
                                     <svg viewBox="0 0 48 48" fill="none">
                                         <circle cx="12" cy="11" r="4" fill="#f4c642"/>
@@ -159,7 +159,7 @@
                         </div>
 
                         <div class="directory-table-art directory-table-art--right" aria-hidden="true">
-                            @for ($artIndex = 0; $artIndex < 5; $artIndex++)
+                            @for ($artIndex = 0; $artIndex < 2; $artIndex++)
                                 <span class="directory-table-art__item directory-table-art__item--sprout">
                                     <svg viewBox="0 0 48 48" fill="none">
                                         <circle cx="12" cy="11" r="4" fill="#f4c642"/>

@@ -14,22 +14,11 @@ class PublicInformationController extends Controller
 {
     public function poktans(): View
     {
-        $activePoktanCounts = Poktan::query()
-            ->where('status', 'Aktif')
-            ->whereNotNull('commodity')
-            ->where('commodity', '<>', '')
-            ->select('commodity')
-            ->selectRaw('COUNT(*) as total')
-            ->groupBy('commodity')
-            ->orderByDesc('total')
-            ->limit(3)
-            ->pluck('total', 'commodity');
+        $activePoktans = Poktan::query()->where('status', 'Aktif');
+        $poktanTotal = (clone $activePoktans)->count();
 
-        $activePoktanTotal = Poktan::query()->where('status', 'Aktif')->count();
-
-        $rows = Poktan::query()
-            ->select(['name', 'district', 'commodity', 'member_count'])
-            ->where('status', 'Aktif')
+        $rows = (clone $activePoktans)
+            ->select(['name', 'district', 'commodity', 'member_count', 'status'])
             ->orderBy('name')
             ->limit(12)
             ->get()
@@ -38,17 +27,19 @@ class PublicInformationController extends Controller
                 $poktan->district,
                 $poktan->commodity,
                 number_format($poktan->member_count).' anggota',
+                $poktan->status,
             ])
             ->all();
 
         return $this->page(
             title: 'Data Kelompok Tani',
-            description: 'Direktori kelompok tani aktif yang menjadi penggerak pertanian Kabupaten Kutai Barat.',
-            statistic: $activePoktanTotal,
-            statisticLabel: 'Kelompok tani aktif',
-            columns: ['Kelompok Tani', 'Kecamatan', 'Komoditas', 'Anggota'],
+            description: 'Direktori kelompok tani aktif di Kabupaten Kutai Barat untuk layanan publik dan pemantauan.',
+            statistic: $poktanTotal,
+            statisticLabel: 'Kelompok tani terdaftar',
+            columns: ['Kelompok Tani', 'Kecamatan', 'Komoditas', 'Anggota', 'Status'],
             rows: $rows,
-            recommendations: $this->makeRecommendations($activePoktanCounts, $activePoktanTotal, 'Kelompok tani dengan komoditas'),
+            chart: [['label' => 'Poktan aktif', 'value' => $poktanTotal, 'color' => '#0d7838']],
+            recommendations: $this->makeRecommendations(collect(['Aktif' => $poktanTotal]), $poktanTotal, 'Status kelompok tani'),
         );
     }
 
@@ -202,11 +193,7 @@ class PublicInformationController extends Controller
      */
     private function page(string $title, string $description, int $statistic, string $statisticLabel, array $columns, array|LengthAwarePaginator $rows, ?array $chart = null, ?array $recommendations = null): View
     {
-        $chart ??= [
-            ['label' => 'Data terintegrasi', 'value' => $statistic, 'color' => '#0d7838'],
-            ['label' => 'Pemantauan aktif', 'value' => 0, 'color' => '#a4c64b'],
-            ['label' => 'Layanan publik', 'value' => 0, 'color' => '#f5c743'],
-        ];
+        $chart ??= [['label' => $statisticLabel, 'value' => $statistic, 'color' => '#0d7838']];
 
         $recommendations ??= $statistic > 0
             ? [[
@@ -235,7 +222,7 @@ class PublicInformationController extends Controller
         return $counts->map(function (int|float $count, string $category) use ($groupLabel, $total): array {
             $percentage = round($count / $total * 100, 1);
             $tone = match (mb_strtolower($category)) {
-                'rusak berat' => 'danger',
+                'rusak berat', 'nonaktif' => 'danger',
                 'rusak ringan', 'perlu restok' => 'warning',
                 'baik', 'tersedia', 'aktif' => 'success',
                 default => 'info',

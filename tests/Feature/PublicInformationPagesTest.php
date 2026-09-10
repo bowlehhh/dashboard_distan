@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Alsintan;
+use App\Models\Poktan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,6 +31,36 @@ class PublicInformationPagesTest extends TestCase
 
         $response->assertSee('Data Kelompok Tani')
             ->assertSee('public-directory-shell--empty');
+    }
+
+    public function test_public_poktan_page_only_includes_active_groups_in_the_table_and_chart(): void
+    {
+        Poktan::query()->create([
+            'name' => 'Poktan Aktif',
+            'chairperson' => 'Ketua Aktif',
+            'district' => 'Melak',
+            'village' => 'Melak Ulu',
+            'commodity' => 'Padi',
+            'member_count' => 20,
+            'status' => 'Aktif',
+        ]);
+        Poktan::query()->create([
+            'name' => 'Poktan Nonaktif',
+            'chairperson' => 'Ketua Nonaktif',
+            'district' => 'Jempang',
+            'village' => 'Tanjung Isuy',
+            'commodity' => 'Jagung',
+            'member_count' => 15,
+            'status' => 'Nonaktif',
+        ]);
+
+        $response = $this->get(route('public.poktans'));
+
+        $response->assertSee('Poktan Aktif')
+            ->assertDontSee('Poktan Nonaktif')
+            ->assertSee('Aktif')
+            ->assertDontSee('Nonaktif')
+            ->assertSee('Kelompok tani aktif');
     }
 
     public function test_public_alsintan_page_paginates_rows_without_authentication(): void

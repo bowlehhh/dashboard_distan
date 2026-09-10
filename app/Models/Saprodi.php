@@ -11,12 +11,12 @@ class Saprodi extends Model
     /** @use HasFactory<SaprodiFactory> */
     use HasFactory;
 
-    protected $fillable = ['name', 'category', 'unit', 'stock', 'minimum_stock', 'notes'];
+    protected $fillable = ['name', 'category', 'unit', 'stock', 'minimum_stock', 'photo_path', 'notes'];
 
     protected $appends = ['stock_status'];
 
     public function getStockStatusAttribute(): string
     {
-        return $this->stock <= $this->minimum_stock ? 'Perlu Restok' : 'Tersedia';
+        return $this->stock <= $this->minimum_stock ? 'Stok Menipis' : 'Tersedia';
     }
 }

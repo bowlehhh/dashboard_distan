@@ -1,5 +1,18 @@
 const appMenuToggle = document.querySelector('[data-menu-toggle]');
 const appSidebar = document.querySelector('[data-sidebar]');
+const saprodiCategorySelect = document.querySelector('[data-saprodi-category]');
+const customCategoryField = document.querySelector('[data-custom-category-field]');
+const customCategoryInput = document.querySelector('[data-custom-category-input]');
+
+const syncCustomCategoryField = () => {
+    const isCustomCategory = saprodiCategorySelect?.value === 'Lainnya';
+
+    customCategoryField?.toggleAttribute('hidden', ! isCustomCategory);
+    customCategoryInput?.toggleAttribute('required', isCustomCategory);
+};
+
+saprodiCategorySelect?.addEventListener('change', syncCustomCategoryField);
+syncCustomCategoryField();
 
 const closeAppSidebar = () => {
     appSidebar?.classList.remove('open');

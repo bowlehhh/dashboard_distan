@@ -76,6 +76,7 @@ h1{margin:0;font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
 .field label{color:#425249;font-size:12px;font-weight:700}
 .field input,.field select,.field textarea{width:100%;min-height:42px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);background:#fff;outline-color:var(--green)}
 .field textarea{min-height:92px;resize:vertical}
+.form-intro{margin:0 0 20px;padding:12px 14px;border-left:4px solid var(--green);border-radius:8px;background:#f0f8f1;color:#4f6654;font-size:13px;line-height:1.55}
 .error{color:var(--danger);font-size:11px}
 .form-footer{display:flex;justify-content:flex-end;gap:9px;margin-top:23px;padding-top:20px;border-top:1px solid var(--line)}
 .notice{margin:0 0 20px;padding:12px 14px;border-radius:10px;color:#176c3a;background:#eaf8ed;font-size:13px}
@@ -208,7 +209,7 @@ h1{margin:0;font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
 }
 
 /* Keep the sidebar controls visible while the main document remains the only scroll area. */
-.app-body .sidebar{overflow:hidden}
+.app-body .sidebar{overflow-y:auto;overscroll-behavior:contain}
 .app-body .sidebar nav{padding-bottom:66px}
 .app-body .sidebar-footer{position:absolute;right:22px;bottom:22px;left:22px;margin:0;padding-top:12px;border-top:1px solid #ffffff26;background:#004b1c}
 .app-body .sidebar-footer .nav-link{margin:0}
@@ -276,6 +277,7 @@ h1{margin:0;font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
 .table-photo{display:block;width:54px;height:44px;object-fit:cover;border:1px solid #d5e5d7;border-radius:8px;background:#f1f7f1;transition:transform .18s ease,box-shadow .18s ease}
 .table-photo:hover{position:relative;z-index:1;transform:scale(1.08);box-shadow:0 5px 14px #073e0430}
 .table-photo-empty{display:grid;width:54px;height:44px;place-items:center;border:1px dashed #c8d8ca;border-radius:8px;color:#8a9b8d;background:#f7faf7;font-size:16px}
+.dashboard-data-label{display:block;margin-bottom:4px;color:#607362;font-size:10px;font-weight:800;text-transform:uppercase}
 
 /* Fit every navigation item cleanly above the fixed logout area. */
 @media(min-width:981px){
@@ -389,6 +391,36 @@ body.modal-open{overflow:hidden}.logout-modal[hidden]{display:none}.logout-modal
 /* Keep the complete eight-module navigation compact and legible on desktop. */
 .landing-nav--complete,.directory-nav--complete{gap:clamp(10px,1.05vw,18px);font-size:11px}.landing-nav--complete>a,.directory-nav--complete>a{letter-spacing:-.01em}.landing-nav--complete .landing-login{min-width:72px;padding:11px 14px}.directory-nav--complete .directory-login{padding:11px 15px}
 @media(min-width:1500px){.landing-nav--complete,.directory-nav--complete{gap:clamp(12px,1.15vw,22px);font-size:12px}.landing-nav--complete .landing-login{min-width:79px;padding:12px 17px}.directory-nav--complete .directory-login{padding:12px 18px}}
+
+/* Keep the landing page comfortable at the browser's default 100% zoom on wide desktops. */
+@media(min-width:1500px){
+    .public-home .landing-header{height:79px;padding:18px min(5.2vw,97px) 0}
+    .public-home .landing-brand__image{width:clamp(227px,16.875vw,324px)}
+    .public-home .landing-nav--complete{gap:clamp(11px,1.04vw,20px);font-size:11px}
+    .public-home .landing-nav--complete .landing-login{min-width:71px;padding:11px 15px}
+    .public-home .landing-hero{grid-template-columns:minmax(513px,630px) minmax(558px,675px);gap:clamp(63px,5.3vw,99px);width:calc(100vw - 72px);max-width:1485px;height:calc(100vh - 79px);padding-top:36px}
+    .public-home .landing-copy{max-width:513px}
+    .public-home .landing-eyebrow{width:347px;min-height:41px;margin-bottom:54px;font-size:11px}
+    .public-home .landing-copy h1{font-size:47px}
+    .public-home .landing-description{max-width:504px;margin-top:25px;font-size:18px}
+    .public-home .landing-actions{gap:66px;margin:29px 0 36px 41px}
+    .public-home .landing-button{min-width:185px;height:61px;font-size:14px}
+    .public-home .landing-stats{width:513px;gap:13px}
+    .public-home .landing-stat{min-height:104px}
+    .public-home .landing-stat strong{font-size:25px}
+    .public-home .landing-visual{gap:22px;margin-top:-38px}
+    .public-home .office-collage{width:599px;height:541px;margin-left:81px}
+    .public-home .office-hex{width:183px;height:194px}
+    .public-home .office-hex::after{background-size:596px auto}
+    .public-home .office-hex--one{top:93px;left:0;--office-position:-4px -96px}
+    .public-home .office-hex--two{top:190px;left:207px;--office-position:-211px -194px}
+    .public-home .office-hex--three{top:93px;left:413px;--office-position:-417px -96px}
+    .public-home .office-hex--four{top:292px;left:0;--office-position:-4px -295px}
+    .public-home .office-hex--six{top:292px;left:413px;--office-position:-417px -295px}
+    .public-home .office-hex--seven{top:389px;left:207px;--office-position:-211px -392px}
+    .public-home .office-crest{top:23px;left:220px;width:126px}
+    .public-home .landing-promise{width:675px;max-width:675px;min-height:72px;padding:23px;font-size:15px}
+}
 
 /* Decorative public-page treatment and compact accompanying data visual. */
 .directory-header{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(100deg,#043808 0%,#074a10 62%,#063707 100%)}.directory-header::after{position:absolute;z-index:-1;inset:0;background-image:linear-gradient(115deg,transparent 0 68%,#d7ed7f12 68% 68.15%,transparent 68.15% 73%),radial-gradient(circle at 75% 20%,#54bd551f 0 2px,transparent 2.5px);background-size:auto,22px 22px;content:''}.directory-brand,.directory-nav{position:relative;z-index:1}.directory-hero{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(circle at 77% 34%,#52bb5b42 0 2%,transparent 24%),radial-gradient(circle at 98% 88%,#2b9c3d 0,transparent 35%),linear-gradient(112deg,#043a07 0%,#075518 56%,#0c7424 100%)}.directory-hero::before,.directory-hero::after{position:absolute;z-index:-1;display:block;border:1px solid #d7ee9a2b;content:''}.directory-hero::before{width:410px;height:410px;right:8%;bottom:-270px;border-radius:42% 58% 51% 49% / 42% 44% 56% 58%;transform:rotate(24deg)}.directory-hero::after{width:260px;height:260px;right:26%;top:-175px;border-radius:50%;box-shadow:0 0 0 38px #d7ee9a0a,0 0 0 76px #d7ee9a08}.directory-hero>*,.directory-stat{position:relative;z-index:1}.directory-data-grid{display:grid;grid-template-columns:minmax(0,1fr) 246px;align-items:stretch;gap:24px}.directory-chart-card{display:grid;align-content:start;justify-items:center;gap:15px;padding:20px 17px;border:1px solid #d8e8da;border-radius:16px;background:linear-gradient(150deg,#fff,#f2f8f1);box-shadow:0 12px 30px #073e0414}.directory-chart-card>p{width:100%;margin:0;color:#168043;font-size:10px;font-weight:800;letter-spacing:.1em;text-align:left}.directory-donut{position:relative;display:grid;width:142px;aspect-ratio:1;place-items:center;border-radius:50%;background:conic-gradient(#0d7838 0 62%,#a4c64b 62% 83%,#f5c743 83% 100%);box-shadow:0 8px 18px #0b633329}.directory-donut::after{position:absolute;width:94px;aspect-ratio:1;border-radius:50%;background:#f9fcf8;box-shadow:inset 0 0 0 1px #e1ece2;content:''}.directory-donut span{position:relative;z-index:1;display:grid;gap:2px;text-align:center}.directory-donut strong{color:#07551e;font:800 27px/1 Manrope,sans-serif;letter-spacing:-.06em}.directory-donut small{color:#5f7564;font-size:10px;font-weight:700}.directory-chart-legend{display:grid;width:100%;gap:8px;margin:0;padding:0;list-style:none;color:#49634f;font-size:11px;font-weight:700}.directory-chart-legend li{display:flex;align-items:center;gap:7px}.directory-chart-legend i{width:9px;height:9px;border-radius:50%;background:#0d7838}.directory-chart-legend .is-lime{background:#a4c64b}.directory-chart-legend .is-gold{background:#f5c743}.directory-pagination{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}.directory-pagination a,.directory-pagination span{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border:1px solid #cfe0d1;border-radius:999px;background:#fff;color:#0d7136;font-size:13px;font-weight:800;box-shadow:0 6px 16px #073e0408}.directory-pagination a:hover{border-color:#8fc69e;background:#edf8ed}.directory-pagination [aria-current=page]{border-color:var(--green);background:var(--green);color:#fff}@media(max-width:900px){.directory-data-grid{grid-template-columns:1fr}.directory-chart-card{grid-template-columns:auto 1fr;align-items:center;justify-items:start}.directory-chart-card>p{grid-column:1/-1}.directory-chart-legend{align-self:center}}@media(max-width:540px){.directory-chart-card{grid-template-columns:1fr;justify-items:center}.directory-chart-card>p{text-align:center}.directory-chart-legend{max-width:180px}}
@@ -816,20 +848,15 @@ body.modal-open{overflow:hidden}.logout-modal[hidden]{display:none}.logout-modal
 }
 
 @media(min-width:851px){
-    /* Start the flower trail below the hero overlap and carry it down the page. */
+    /* Place two flower illustrations on each side of the public page. */
     .directory-table-art{top:190px;width:150px;height:calc(100% - 245px);min-height:620px}
     .directory-table-art--left{left:-190px}
     .directory-table-art--right{right:-190px}
-    .directory-table-art--left .directory-table-art__item:nth-child(1){top:2%;left:4%}
-    .directory-table-art--left .directory-table-art__item:nth-child(2){top:22%;right:3%;left:auto}
-    .directory-table-art--left .directory-table-art__item:nth-child(3){top:43%;left:12%}
-    .directory-table-art--left .directory-table-art__item:nth-child(4){top:64%;right:3%;left:auto}
-    .directory-table-art--left .directory-table-art__item:nth-child(5){top:84%;right:auto;bottom:auto;left:10%}
-    .directory-table-art--right .directory-table-art__item:nth-child(1){top:2%;right:8%;left:auto}
-    .directory-table-art--right .directory-table-art__item:nth-child(2){top:23%;left:2%}
-    .directory-table-art--right .directory-table-art__item:nth-child(3){top:44%;right:8%;left:auto}
-    .directory-table-art--right .directory-table-art__item:nth-child(4){top:65%;right:auto;left:0}
-    .directory-table-art--right .directory-table-art__item:nth-child(5){top:85%;right:8%;bottom:auto;left:auto}
+    .directory-table-art--left .directory-table-art__item:nth-child(1){top:6%;left:4%}
+    .directory-table-art--left .directory-table-art__item:nth-child(2){top:62%;right:3%;left:auto}
+    .directory-table-art--right .directory-table-art__item:nth-child(1){top:6%;right:8%;left:auto}
+    .directory-table-art--right .directory-table-art__item:nth-child(2){top:62%;left:2%}
+    .directory-table-art__item:nth-child(n+3){display:none}
 }
 
 /* Final public-page shell: loader is outside this flow; page content and footer are not. */
@@ -975,3 +1002,17 @@ body.public-directory{display:block;min-height:0;padding:0!important}
 .landing-notice.is-leaving{opacity:0;transform:translate(-50%,-8px);pointer-events:none;transition:opacity .22s ease,transform .22s ease}
 .auth-panel-home-link{display:none;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:20px;color:#08723a;font-size:12px;font-weight:800;transition:color .18s ease,transform .18s ease}.auth-panel-home-link span{display:grid;width:27px;height:27px;place-items:center;border:1px solid #b7d5bb;border-radius:50%;background:#f1f9f0;font-size:16px;line-height:1}.auth-panel-home-link:hover{color:#07552c;transform:translateX(-3px)}.auth-panel-home-link:hover span{background:#e4f3e3}
 @media(max-width:980px){.auth-panel-home-link{display:inline-flex}}
+
+/* Keep the desktop sidebar tidy while allowing every navigation item to remain reachable. */
+@media(min-width:981px){
+    .app-body .sidebar{display:flex;flex-direction:column;padding:38px 20px 18px;overflow:hidden}
+    .app-body .sidebar .brand{margin:0 8px 22px}
+    .app-body .sidebar nav{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;gap:5px;padding:0 2px 10px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#7fc78a transparent}
+    .app-body .sidebar nav::-webkit-scrollbar{width:5px}
+    .app-body .sidebar nav::-webkit-scrollbar-thumb{border-radius:999px;background:#7fc78a}
+    .app-body .sidebar .nav-link{min-height:43px;padding:10px 15px;border-radius:9px;transition:background .18s ease,box-shadow .18s ease,transform .18s ease}
+    .app-body .sidebar .nav-link:hover{background:#167a34;transform:translateX(2px)}
+    .app-body .sidebar .nav-link.active{background:#279f45;box-shadow:inset 3px 0 0 #d7ef70,0 4px 10px #002b0c55}
+    .app-body .sidebar-footer{position:static;flex:0 0 auto;margin:10px 2px 0;padding:12px 0 0;border-top:1px solid #ffffff26;background:transparent}
+    .app-body .sidebar-footer .nav-link{padding:10px 15px}
+}

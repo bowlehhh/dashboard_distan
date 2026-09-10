@@ -18,7 +18,7 @@ class AlsintanController extends Controller
      */
     public function index(Request $request): View
     {
-        $alsintans = Alsintan::with('poktan')->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('type', 'like', "%{$search}%")->orWhere('brand_type', 'like', "%{$search}%")->orWhere('inventory_number', 'like', "%{$search}%")))->when($request->district, fn ($query, $district) => $query->where('district', $district))->when($request->condition, fn ($query, $condition) => $query->where('condition', $condition))->latest()->paginate(10)->withQueryString();
+        $alsintans = Alsintan::with('poktan')->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('type', 'like', "%{$search}%")->orWhere('brand_type', 'like', "%{$search}%")->orWhere('inventory_number', 'like', "%{$search}%")))->when($request->district, fn ($query, $district) => $query->where('district', $district))->when($request->condition, fn ($query, $condition) => $query->where('condition', $condition))->latest()->paginate(100)->withQueryString();
 
         return view('alsintans.index', compact('alsintans'));
     }
@@ -28,7 +28,7 @@ class AlsintanController extends Controller
      */
     public function create(): View
     {
-        return view('alsintans.form', ['alsintan' => new Alsintan, 'poktans' => Poktan::orderBy('name')->get()]);
+        return view('alsintans.form', ['alsintan' => new Alsintan, 'poktans' => Poktan::query()->where('status', 'Aktif')->orderBy('name')->get()]);
     }
 
     /**
@@ -54,7 +54,7 @@ class AlsintanController extends Controller
      */
     public function edit(Alsintan $alsintan): View
     {
-        return view('alsintans.form', ['alsintan' => $alsintan, 'poktans' => Poktan::orderBy('name')->get()]);
+        return view('alsintans.form', ['alsintan' => $alsintan, 'poktans' => Poktan::query()->where('status', 'Aktif')->orderBy('name')->get()]);
     }
 
     /**
@@ -89,7 +89,7 @@ class AlsintanController extends Controller
 
     private function validated(Request $request, ?Alsintan $alsintan = null): array
     {
-        $data = $request->validate(['type' => ['required', 'string', 'max:120'], 'brand_type' => ['required', 'string', 'max:120'], 'inventory_number' => ['required', 'string', 'max:80', $this->inventoryNumberRule($alsintan)], 'poktan_id' => [$request->boolean('survey') ? 'required' : 'nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'village' => ['required', 'string', 'max:120'], 'procurement_year' => ['required', 'integer', 'between:1950,'.now()->year], 'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'usage_status' => ['required', 'string', 'max:100'], 'photo' => ['nullable', 'image', 'max:2048'], 'notes' => ['nullable', 'string'], 'latitude' => ['nullable', 'numeric', 'between:-90,90'], 'longitude' => ['nullable', 'numeric', 'between:-180,180']]);
+        $data = $request->validate(['type' => ['required', 'string', 'max:120'], 'brand_type' => ['required', 'string', 'max:120'], 'inventory_number' => ['required', 'string', 'max:80', $this->inventoryNumberRule($alsintan)], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'village' => ['required', 'string', 'max:120'], 'procurement_year' => ['required', 'integer', 'between:1950,'.now()->year], 'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'usage_status' => ['required', 'string', 'max:100'], 'photo' => ['nullable', 'image', 'max:2048'], 'notes' => ['nullable', 'string'], 'latitude' => ['nullable', 'numeric', 'between:-90,90'], 'longitude' => ['nullable', 'numeric', 'between:-180,180']]);
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('alsintan', 'public');
         }

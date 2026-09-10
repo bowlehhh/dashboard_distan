@@ -15,7 +15,7 @@ class CropController extends Controller
      */
     public function index(Request $request): View
     {
-        $crops = Crop::with('poktan')->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest('period')->paginate(10)->withQueryString();
+        $crops = Crop::with('poktan')->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest('period')->paginate(100)->withQueryString();
         $summary = Crop::selectRaw('commodity, sum(planted_area) as planted_area, sum(production) as production')->groupBy('commodity')->orderByDesc('planted_area')->get();
 
         return view('crops.index', compact('crops', 'summary'));
