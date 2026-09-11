@@ -28,6 +28,8 @@ class PoktanController extends Controller
      */
     public function create(): View
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         return view('poktans.form', ['poktan' => new Poktan]);
     }
 
@@ -72,6 +74,7 @@ class PoktanController extends Controller
      */
     public function destroy(Poktan $poktan): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menghapus data.');
         $poktan->delete();
 
         return redirect()->route('poktans.index')->with('success', 'Data kelompok tani dihapus.');

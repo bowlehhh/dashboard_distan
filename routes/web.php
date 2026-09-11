@@ -48,7 +48,6 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/survei-lapangan', [AlsintanController::class, 'create'])->middleware('role:admin,operator,ppl')->name('survey.create');
     Route::resource('alsintans', AlsintanController::class)->middleware('role:admin,operator,ppl');
     Route::middleware('role:admin,operator')->group(function () {
         Route::resource('poktans', PoktanController::class);
@@ -59,11 +58,13 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     });
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class);
-        Route::get('/pengaturan', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('/pengaturan/profil', [SettingsController::class, 'updateProfile'])->name('settings.profile.update');
-        Route::put('/pengaturan/tampilan', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
-        Route::put('/pengaturan/keamanan', [SettingsController::class, 'updateSecurity'])->name('settings.security.update');
         Route::get('/pengaturan/backup', [SettingsController::class, 'downloadBackup'])->name('settings.backup.download');
         Route::post('/pengaturan/backup/pulihkan', [SettingsController::class, 'restoreBackup'])->name('settings.backup.restore');
+    });
+    Route::middleware('role:admin,operator')->group(function () {
+        Route::get('/pengaturan', [SettingsController::class, 'index'])->name('settings.index');
+        Route::put('/pengaturan/tampilan', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
+        Route::put('/pengaturan/keamanan', [SettingsController::class, 'updateSecurity'])->name('settings.security.update');
     });
 });

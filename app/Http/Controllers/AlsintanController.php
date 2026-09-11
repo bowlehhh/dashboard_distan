@@ -28,6 +28,8 @@ class AlsintanController extends Controller
      */
     public function create(): View
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         return view('alsintans.form', ['alsintan' => new Alsintan, 'poktans' => Poktan::query()->where('status', 'Aktif')->orderBy('name')->get()]);
     }
 
@@ -78,6 +80,7 @@ class AlsintanController extends Controller
      */
     public function destroy(Alsintan $alsintan): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menghapus data.');
         if ($alsintan->photo_path) {
             Storage::disk('public')->delete($alsintan->photo_path);
         }

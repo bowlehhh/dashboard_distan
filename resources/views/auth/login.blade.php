@@ -24,7 +24,6 @@
                 <p class="auth-description">Kelola Poktan, Alsintan, Saprodi, dan Tanaman Pangan Kabupaten Kutai Barat dalam satu sistem terpadu.</p>
                 <div class="auth-highlights">
                     <span><b>01</b>Data terintegrasi</span>
-                    <span><b>02</b>Survei lapangan</span>
                     <span><b>03</b>Monitoring pimpinan</span>
                 </div>
                 <a class="auth-home-link" href="{{ route('home') }}"><span aria-hidden="true">←</span> Kembali ke Beranda</a>

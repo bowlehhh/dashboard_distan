@@ -26,6 +26,8 @@ class CropController extends Controller
      */
     public function create(): View
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         return view('crops.form', ['crop' => new Crop, 'poktans' => Poktan::orderBy('name')->get()]);
     }
 
@@ -70,6 +72,7 @@ class CropController extends Controller
      */
     public function destroy(Crop $crop): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menghapus data.');
         $crop->delete();
 
         return redirect()->route('crops.index')->with('success', 'Data tanaman pangan dihapus.');

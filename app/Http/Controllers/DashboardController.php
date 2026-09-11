@@ -38,8 +38,8 @@ class DashboardController extends Controller
                     'status' => $item->status,
                     'photo' => null,
                     'recorded_at' => $item->created_at,
-                    'show_url' => auth()->user()->hasRole('admin', 'operator') ? route('poktans.show', $item) : null,
-                    'edit_url' => auth()->user()->hasRole('admin', 'operator') ? route('poktans.edit', $item) : null,
+                    'show_url' => route('poktans.show', $item),
+                    'edit_url' => auth()->user()->hasRole('admin') ? route('poktans.edit', $item) : null,
                 ])))
             ->merge($this->whenType($type, 'Saprodi', fn () => Saprodi::query()
                 ->latest()
@@ -62,8 +62,8 @@ class DashboardController extends Controller
                     'status' => $item->stock_status,
                     'photo' => $item->photo_path ? asset('storage/'.$item->photo_path) : null,
                     'recorded_at' => $item->created_at,
-                    'show_url' => auth()->user()->hasRole('admin', 'operator') ? route('saprodis.show', $item) : null,
-                    'edit_url' => auth()->user()->hasRole('admin', 'operator') ? route('saprodis.edit', $item) : null,
+                    'show_url' => route('saprodis.show', $item),
+                    'edit_url' => auth()->user()->hasRole('admin') ? route('saprodis.edit', $item) : null,
                 ])))
             ->merge($this->whenType($type, 'Tanaman Pangan', fn () => Crop::with('poktan')
                 ->latest()
@@ -88,8 +88,8 @@ class DashboardController extends Controller
                     'status' => $item->period,
                     'photo' => null,
                     'recorded_at' => $item->created_at,
-                    'show_url' => auth()->user()->hasRole('admin', 'operator') ? route('crops.show', $item) : null,
-                    'edit_url' => auth()->user()->hasRole('admin', 'operator') ? route('crops.edit', $item) : null,
+                    'show_url' => route('crops.show', $item),
+                    'edit_url' => auth()->user()->hasRole('admin') ? route('crops.edit', $item) : null,
                 ])))
             ->merge($this->whenType($type, 'Alsintan', fn () => (clone $alsintans)
                 ->with('poktan')
@@ -114,7 +114,7 @@ class DashboardController extends Controller
                     'photo' => $item->photo_path ? asset('storage/'.$item->photo_path) : null,
                     'recorded_at' => $item->created_at,
                     'show_url' => route('alsintans.show', $item),
-                    'edit_url' => auth()->user()->hasRole('admin', 'operator') ? route('alsintans.edit', $item) : null,
+                    'edit_url' => auth()->user()->hasRole('admin') ? route('alsintans.edit', $item) : null,
                 ])))
             ->sortByDesc(fn (array $item) => $item['recorded_at'])
             ->take(8)

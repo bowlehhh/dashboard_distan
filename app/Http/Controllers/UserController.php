@@ -76,7 +76,7 @@ class UserController extends Controller
 
     private function validated(Request $request, ?User $user = null): array
     {
-        $rules = ['name' => ['required', 'string', 'max:120'], 'email' => ['required', 'email', 'max:255', 'unique:users,email,'.($user?->id ?? '')], 'role' => ['required', 'in:admin,operator,ppl'], 'unit_kerja' => ['nullable', 'string', 'max:120'], 'is_active' => ['required', 'boolean']];
+        $rules = ['name' => ['required', 'string', 'max:120'], 'email' => ['required', 'email', 'max:255', 'unique:users,email,'.($user?->id ?? '')], 'role' => ['required', 'in:admin,operator'], 'unit_kerja' => ['nullable', 'string', 'max:120'], 'is_active' => ['required', 'boolean']];
         if (! $user || $request->filled('password')) {
             $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
         }

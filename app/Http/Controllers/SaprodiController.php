@@ -25,6 +25,8 @@ class SaprodiController extends Controller
      */
     public function create(): View
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         return view('saprodis.form', ['saprodi' => new Saprodi]);
     }
 
@@ -75,6 +77,7 @@ class SaprodiController extends Controller
      */
     public function destroy(Saprodi $saprodi): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menghapus data.');
         if ($saprodi->photo_path) {
             Storage::disk('public')->delete($saprodi->photo_path);
         }

@@ -21,11 +21,12 @@
                 <a class="nav-link {{ request()->routeIs('saprodis.*') ? 'active' : '' }}" href="{{ route('saprodis.index') }}"><i class="nav-icon">◇</i>Data Saprodi</a>
                 <a class="nav-link {{ request()->routeIs('crops.*') ? 'active' : '' }}" href="{{ route('crops.index') }}"><i class="nav-icon">◆</i>Tanaman Pangan</a>
             @endif
-            <a class="nav-link {{ request()->routeIs('survey.*') ? 'active' : '' }}" href="{{ route('survey.create') }}"><i class="nav-icon">⌾</i>Survei Lapangan</a>
             @if(auth()->user()->hasRole('admin', 'operator'))<a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}"><i class="nav-icon">▤</i>Laporan</a>@endif
             @if(auth()->user()->hasRole('admin'))
                 <p class="nav-label">Administrasi</p>
                 <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}"><i class="nav-icon">●</i>Manajemen Akun</a>
+            @endif
+            @if(auth()->user()->hasRole('admin', 'operator'))
                 <a class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" href="{{ route('settings.index') }}"><i class="nav-icon">⚙</i>Pengaturan</a>
             @endif
         </nav>

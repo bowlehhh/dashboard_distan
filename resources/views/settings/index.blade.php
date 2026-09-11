@@ -1,9 +1,15 @@
 <x-app-layout title="Pengaturan">
     <nav class="settings-nav" aria-label="Bagian pengaturan">
-        <a href="#profil">Profil Instansi</a><a href="#akses">Hak Akses</a><a href="#backup">Backup Data</a><a href="#tampilan">Tampilan</a><a href="#keamanan">Keamanan</a>
+        @if(auth()->user()->hasRole('admin'))
+            <a href="#profil">Profil Instansi</a><a href="#akses">Hak Akses</a><a href="#backup">Backup Data</a>
+        @endif
+        @if(auth()->user()->hasRole('admin', 'operator'))
+            <a href="#tampilan">Tampilan</a><a href="#keamanan">Keamanan Akun</a>
+        @endif
     </nav>
 
     <section class="settings-stack">
+        @if(auth()->user()->hasRole('admin'))
         <article class="settings-card" id="profil">
             <div class="settings-card__heading"><i>✎</i><div><h2>Profil Instansi</h2><p>Perbarui identitas yang digunakan oleh SIMANTAP.</p></div></div>
             <form method="post" action="{{ route('settings.profile.update') }}" enctype="multipart/form-data" aria-label="Form profil instansi">
@@ -33,6 +39,7 @@
                 <div class="field"><label for="backup">Pulihkan dari file backup</label><input id="backup" type="file" name="backup" accept="application/json,.json" required></div><button class="btn btn-outline">Pulihkan Data</button>
             </form>
         </article>
+        @endif
 
         <article class="settings-card" id="tampilan">
             <div class="settings-card__heading"><i>◐</i><div><h2>Tampilan</h2><p>Pilih kepadatan antarmuka yang nyaman untuk digunakan.</p></div></div>
@@ -40,8 +47,8 @@
         </article>
 
         <article class="settings-card" id="keamanan">
-            <div class="settings-card__heading"><i>✓</i><div><h2>Keamanan</h2><p>Ganti kata sandi dan akhiri sesi pada perangkat lain.</p></div></div>
-            <form method="post" action="{{ route('settings.security.update') }}" aria-label="Form keamanan akun" data-security-form>@csrf @method('put')<div class="field settings-choice"><label for="security-user">Email akun yang akan diubah</label><select id="security-user" name="user_id" data-security-user required>@foreach($securityUsers as $securityUser)<option value="{{ $securityUser->id }}" data-is-current="{{ $securityUser->is(auth()->user()) ? 'true' : 'false' }}" @selected(old('user_id', auth()->id()) == $securityUser->id)>{{ $securityUser->email }} — {{ $securityUser->name }}{{ ! $securityUser->is_active ? ' (Nonaktif)' : '' }}</option>@endforeach</select><small class="security-help" data-security-help>Pilih email pengguna dari Manajemen Akun yang password-nya ingin diperbarui.</small></div><div class="form-grid"><div class="field full" data-current-password-field><label for="current_password">Kata sandi saat ini</label><input id="current_password" type="password" name="current_password" autocomplete="current-password"></div><div class="field"><label for="password">Kata sandi baru</label><input id="password" type="password" name="password" autocomplete="new-password" required></div><div class="field"><label for="password_confirmation">Konfirmasi kata sandi baru</label><input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required></div></div><label class="settings-checkbox"><input type="checkbox" name="logout_other_sessions" value="1" checked> Akhiri sesi pada perangkat lain</label><div class="form-footer"><button class="btn btn-primary">Perbarui Keamanan</button></div></form>
+            <div class="settings-card__heading"><i>✓</i><div><h2>Keamanan Akun</h2><p>Ganti kata sandi akun Anda sendiri.</p></div></div>
+            <form method="post" action="{{ route('settings.security.update') }}" aria-label="Form keamanan akun" data-security-form>@csrf @method('put')<div class="field"><label for="security-user">Akun Anda</label><input id="security-user" type="text" value="{{ auth()->user()->email }} — {{ auth()->user()->name }}" readonly></div><div class="form-grid"><div class="field full" data-current-password-field><label for="current_password">Kata sandi saat ini</label><input id="current_password" type="password" name="current_password" autocomplete="current-password"></div><div class="field"><label for="password">Kata sandi baru</label><input id="password" type="password" name="password" autocomplete="new-password" required></div><div class="field"><label for="password_confirmation">Konfirmasi kata sandi baru</label><input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required></div></div><label class="settings-checkbox"><input type="checkbox" name="logout_other_sessions" value="1" checked> Akhiri sesi pada perangkat lain</label><div class="form-footer"><button class="btn btn-primary">Perbarui Keamanan</button></div></form>
         </article>
     </section>
 </x-app-layout>
