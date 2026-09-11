@@ -188,28 +188,17 @@
 
                 <aside class="directory-chart-card" aria-label="Ringkasan visual data">
                     @php
-                        $chartTotal = max(1, array_sum(array_column($chart, 'value')));
-                        $chartOffset = 0;
-                        $chartStops = [];
-                        foreach ($chart as $chartItem) {
-                            $chartPercentage = $chartItem['value'] / $chartTotal * 100;
-                            $chartStops[] = $chartItem['color'].' '.$chartOffset.'% '.($chartOffset + $chartPercentage).'%';
-                            $chartOffset += $chartPercentage;
-                        }
+                        $pyramidTones = ['is-top', 'is-mid', 'is-base'];
                     @endphp
                     <p>DISTRIBUSI DATA</p>
-                    <div class="directory-donut" role="img" aria-label="Distribusi {{ $statisticLabel }}" style="background: conic-gradient({{ implode(', ', $chartStops) }})">
-                        <span><strong>{{ number_format($statistic, 0, ',', '.') }}</strong><small>data</small></span>
-                    </div>
-                    <ul class="directory-chart-legend">
-                        @foreach ($chart as $chartItem)
-                            <li>
-                                <i style="background: {{ $chartItem['color'] }}"></i>
-                                <span>{{ $chartItem['label'] }}</span>
-                                <strong>{{ number_format($chartItem['value'], 0, ',', '.') }}</strong>
-                            </li>
+                    <div class="directory-pyramid" role="img" aria-label="Distribusi {{ $statisticLabel }}">
+                        @foreach ($chart as $chartIndex => $chartItem)
+                            <div class="directory-pyramid__level {{ $pyramidTones[$chartIndex] }}{{ $chartItem['value'] > 0 ? '' : ' is-empty' }}">
+                                <span class="directory-pyramid__value">{{ number_format($chartItem['value'], 0, ',', '.') }}</span>
+                                <span class="directory-pyramid__label">{{ $chartItem['label'] }}</span>
+                            </div>
                         @endforeach
-                    </ul>
+                    </div>
                 </aside>
             </div>
 

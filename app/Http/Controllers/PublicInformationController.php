@@ -38,7 +38,6 @@ class PublicInformationController extends Controller
             statisticLabel: 'Kelompok tani terdaftar',
             columns: ['Kelompok Tani', 'Kecamatan', 'Komoditas', 'Anggota', 'Status'],
             rows: $rows,
-            chart: [['label' => 'Poktan aktif', 'value' => $poktanTotal, 'color' => '#0d7838']],
             recommendations: $this->makeRecommendations(collect(['Aktif' => $poktanTotal]), $poktanTotal, 'Status kelompok tani'),
         );
     }
@@ -72,11 +71,6 @@ class PublicInformationController extends Controller
             statisticLabel: 'Unit alsintan terdaftar',
             columns: ['Jenis Alsintan', 'Merk / Tipe', 'Kecamatan', 'Kondisi'],
             rows: $rows,
-            chart: [
-                ['label' => 'Baik', 'value' => (int) $conditionCounts->get('Baik', 0), 'color' => '#0d7838'],
-                ['label' => 'Rusak Ringan', 'value' => (int) $conditionCounts->get('Rusak Ringan', 0), 'color' => '#a4c64b'],
-                ['label' => 'Rusak Berat', 'value' => (int) $conditionCounts->get('Rusak Berat', 0), 'color' => '#f5c743'],
-            ],
             recommendations: $this->makeRecommendations($conditionCounts, $alsintanTotal, 'Kondisi alsintan'),
         );
     }
@@ -188,12 +182,11 @@ class PublicInformationController extends Controller
     /**
      * @param  array<int, string>  $columns
      * @param  array<int, array<int, string>>|LengthAwarePaginator  $rows
-     * @param  array<int, array{label: string, value: int, color: string}>|null  $chart
      * @param  array<int, array{tone: string, label: string, title: string, value: int, percentage: float, description: string}>|null  $recommendations
      */
-    private function page(string $title, string $description, int $statistic, string $statisticLabel, array $columns, array|LengthAwarePaginator $rows, ?array $chart = null, ?array $recommendations = null): View
+    private function page(string $title, string $description, int $statistic, string $statisticLabel, array $columns, array|LengthAwarePaginator $rows, ?array $recommendations = null): View
     {
-        $chart ??= [['label' => $statisticLabel, 'value' => $statistic, 'color' => '#0d7838']];
+        $chart = $this->chartForPage(request()->routeIs('public.alsintans'), request()->routeIs('public.poktans'), request()->routeIs('public.saprodis'), request()->routeIs('public.crops'));
 
         $recommendations ??= $statistic > 0
             ? [[
@@ -207,6 +200,50 @@ class PublicInformationController extends Controller
             : [];
 
         return view('public-information', compact('title', 'description', 'statistic', 'statisticLabel', 'columns', 'rows', 'chart', 'recommendations'));
+    }
+
+    /**
+     * Buat data chart pyramid sesuai halaman yang sedang dibuka.
+     */
+    private function chartForPage(bool $isAlsintans, bool $isPoktans, bool $isSaprodis, bool $isCrops): array
+    {
+        if ($isAlsintans) {
+            return [
+                ['label' => 'Jenis alsintan', 'value' => Alsintan::query()->distinct()->count('type')],
+                ['label' => 'Kecamatan', 'value' => Alsintan::query()->distinct()->count('district')],
+                ['label' => 'Kondisi', 'value' => Alsintan::query()->distinct()->count('condition')],
+            ];
+        }
+
+        if ($isPoktans) {
+            return [
+                ['label' => 'Kelompok tani', 'value' => Poktan::query()->where('status', 'Aktif')->distinct()->count('id')],
+                ['label' => 'Kecamatan', 'value' => Poktan::query()->distinct()->count('district')],
+                ['label' => 'Komoditas', 'value' => Poktan::query()->whereNotNull('commodity')->distinct('commodity')->count('commodity')],
+            ];
+        }
+
+        if ($isSaprodis) {
+            return [
+                ['label' => 'Jenis saprodi', 'value' => Saprodi::query()->distinct()->count('name')],
+                ['label' => 'Kategori', 'value' => Saprodi::query()->whereNotNull('category')->where('category', '<>', '')->distinct('category')->count('category')],
+                ['label' => 'Satuan', 'value' => Saprodi::query()->whereNotNull('unit')->distinct('unit')->count('unit')],
+            ];
+        }
+
+        if ($isCrops) {
+            return [
+                ['label' => 'Komoditas', 'value' => Crop::query()->whereNotNull('commodity')->distinct('commodity')->count('commodity')],
+                ['label' => 'Kecamatan', 'value' => Crop::query()->distinct()->count('district')],
+                ['label' => 'Panen', 'value' => Crop::query()->whereNotNull('period')->distinct('period')->count('period')],
+            ];
+        }
+
+        return [
+            ['label' => 'Kategori data', 'value' => 4],
+            ['label' => 'Jumlah tabel', 'value' => 4],
+            ['label' => 'Data publik', 'value' => Poktan::query()->where('status', 'Aktif')->count()],
+        ];
     }
 
     /**
