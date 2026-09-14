@@ -8,7 +8,7 @@ use App\Models\Crop;
 use App\Models\Poktan;
 use App\Models\Saprodi;
 use Illuminate\Contracts\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReportController extends Controller
 {
@@ -22,7 +22,7 @@ class ReportController extends Controller
         ]]);
     }
 
-    public function download(string $report, ExcelReportExporter $excelReportExporter): StreamedResponse
+    public function download(string $report, ExcelReportExporter $excelReportExporter): BinaryFileResponse
     {
         $data = match ($report) {
             'alsintan' => [
