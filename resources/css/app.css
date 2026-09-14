@@ -47,6 +47,7 @@ h1{margin:0;font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
 .bar{flex:1;min-width:22px;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:8px;color:var(--muted);font-size:10px;text-align:center}
 .bar i{display:block;width:100%;min-height:7px;border-radius:6px 6px 0 0;background:linear-gradient(#73bd51,var(--green))}
 .bar b{color:var(--green);font-size:11px}
+.chart-legend{display:flex;gap:18px;margin:-8px 0 10px;font-size:12px;color:var(--muted)}.chart-legend span{display:flex;align-items:center;gap:6px}.chart-legend i{width:12px;height:12px;border-radius:2px}.chart-legend__tanam{background:#4d7db0}.chart-legend__panen{background:#73bd51}.bar-chart--comparison{align-items:end}.bar--comparison{justify-content:end}.bar-values{display:flex;gap:5px;min-height:16px}.bar-values b:first-child{color:#4d7db0}.bar-values b:last-child{color:#3c8b33}.bar-pair{display:flex;align-items:end;justify-content:center;gap:4px;width:100%;height:150px}.bar-pair i{display:block;width:calc(50% - 2px);min-height:5px;border-radius:4px 4px 0 0}.bar-pair .bar-tanam{background:#4d7db0}.bar-pair .bar-panen{background:#73bd51}
 .condition-list{display:grid;gap:13px}
 .condition{display:flex;align-items:center;gap:12px;padding:12px;border-radius:11px;background:#f8faf8}
 .condition i{width:11px;height:11px;border-radius:50%;background:var(--green)}
@@ -220,6 +221,54 @@ h1{margin:0;font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
 /* Keep the desktop sidebar compact and prevent it from becoming a second scroll area. */
 @media(min-width:981px){
     .app-body .sidebar{position:fixed;top:106px;bottom:auto;height:min(790px,calc(100vh - 145px));max-height:calc(100vh - 145px);overflow:hidden}
+}
+
+/* Restore a prominent, readable SIMANTAP wordmark beside the shared flower icon. */
+.landing-brand__icon{width:76px;height:76px}
+.landing-brand__wordmark{gap:6px}
+.landing-brand__wordmark strong{font-size:31px;letter-spacing:-.06em}
+.landing-brand__wordmark small{max-width:235px;font-size:9px;font-weight:700;line-height:1.3}
+.directory-brand__icon{width:68px;height:68px}
+.directory-brand__wordmark{gap:5px}
+.directory-brand__wordmark strong{font-size:27px;letter-spacing:-.06em}
+.directory-brand__wordmark small{max-width:205px;font-size:8px;font-weight:700;line-height:1.3}
+
+@media(max-width:540px){
+    .public-home .landing-header{min-height:94px;padding-top:12px;padding-bottom:12px}
+    .landing-brand{gap:12px}
+    .landing-brand__icon{width:70px;height:70px}
+    .landing-brand__wordmark{gap:5px}
+    .landing-brand__wordmark strong{font-size:27px}
+    .landing-brand__wordmark small{display:block;max-width:185px;font-size:8px;line-height:1.32}
+    .directory-brand__icon{width:58px;height:58px}
+    .directory-brand__wordmark strong{font-size:23px}
+    .directory-brand__wordmark small{display:block;max-width:155px;font-size:7px;line-height:1.28}
+}
+
+.app-body .page-recommendations{margin-top:28px}
+.app-body .page-recommendations__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.app-body .page-recommendations article{display:grid;gap:8px;padding:18px;border:1px solid #d8e6da;border-radius:12px;background:#f8fcf8}
+.app-body .page-recommendations strong{color:#176e38;font-size:14px}
+.app-body .page-recommendations span{font-weight:700}
+.app-body .page-recommendations p{margin:0;color:#657568;font-size:12px;line-height:1.5}
+
+/* The year panel was removed, so the district chart now uses the full dashboard width. */
+.app-body .dashboard-grid{grid-template-columns:minmax(0,1fr)}
+
+@media(max-width:640px){
+    .app-body .page-recommendations__grid{grid-template-columns:1fr}
+}
+
+.directory-year-cards .directory-recommendations__grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.directory-year-card{min-width:0}
+.directory-year-card .directory-recommendation__icon{background:#e7f3e7;color:#17763c}
+
+@media(max-width:980px){
+    .directory-year-cards .directory-recommendations__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:540px){
+    .directory-year-cards .directory-recommendations__grid{grid-template-columns:1fr}
 }
 
 /* Keep the sidebar controls visible while the main document remains the only scroll area. */
@@ -412,7 +461,7 @@ body.modal-open{overflow:hidden}.logout-modal[hidden]{display:none}.logout-modal
 /* Keep the landing page comfortable at the browser's default 100% zoom on wide desktops. */
 @media(min-width:1500px){
     .public-home .landing-header{height:79px;padding:18px min(5.2vw,97px) 0}
-    .public-home .landing-brand__image{width:clamp(227px,16.875vw,324px)}
+    .public-home .landing-brand__image{width:clamp(252px,18.75vw,360px)}
     .public-home .landing-nav--complete{gap:clamp(11px,1.04vw,20px);font-size:11px}
     .public-home .landing-nav--complete .landing-login{min-width:71px;padding:11px 15px}
     .public-home .landing-hero{grid-template-columns:minmax(513px,630px) minmax(558px,675px);gap:clamp(63px,5.3vw,99px);width:calc(100vw - 72px);max-width:1485px;height:calc(100vh - 79px);padding-top:36px}
@@ -891,6 +940,7 @@ body.public-directory{display:block;min-height:0;padding:0!important}
     left:auto;
     flex:0 0 auto;
     margin-top:auto;
+    z-index:5;
 }
 
 /* Empty directories still occupy the available viewport height, keeping the footer at the bottom. */
@@ -1012,8 +1062,30 @@ body.public-directory{display:block;min-height:0;padding:0!important}
 }
 /* Temporary success notices should not remain over the landing page. */
 .landing-notice.is-leaving{opacity:0;transform:translate(-50%,-8px);pointer-events:none;transition:opacity .22s ease,transform .22s ease}
+
+/* One shared crop of the official leaf mark keeps branding identical in every screen. */
+.simantap-mark{display:inline-block;width:1em;height:1em;flex:0 0 auto;background-color:#07531b;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain;vertical-align:middle}
+.app-body .sidebar .brand-mark.simantap-mark{background-color:#004b1c;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
+.page-loader__mark.simantap-mark{background-color:#08723a;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
+.auth-wordmark__icon{width:62px;height:62px}
+.auth-panel__identity .auth-wordmark__icon{width:53px;height:53px}
+.landing-brand__icon{width:64px;height:64px}
+.directory-brand__icon{width:64px;height:64px}
+.landing-brand,.directory-brand{display:flex;align-items:center;gap:10px;line-height:1}
+.landing-brand__wordmark,.directory-brand__wordmark{display:grid;gap:4px;color:#fff;font-family:Manrope,sans-serif}
+.landing-brand__wordmark strong,.directory-brand__wordmark strong{font-size:23px;font-weight:800;letter-spacing:-.05em}
+.landing-brand__wordmark small,.directory-brand__wordmark small{max-width:175px;font:600 7px/1.25 'DM Sans',sans-serif;letter-spacing:0}
+
+@media(max-width:540px){
+    .auth-wordmark__icon,.auth-panel__identity .auth-wordmark__icon{width:45px;height:45px}
+    .landing-brand__icon,.directory-brand__icon{width:48px;height:48px}
+    .landing-brand__wordmark strong,.directory-brand__wordmark strong{font-size:18px}
+    .landing-brand__wordmark small,.directory-brand__wordmark small{display:none}
+}
 .auth-panel-home-link{display:none;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:20px;color:#08723a;font-size:12px;font-weight:800;transition:color .18s ease,transform .18s ease}.auth-panel-home-link span{display:grid;width:27px;height:27px;place-items:center;border:1px solid #b7d5bb;border-radius:50%;background:#f1f9f0;font-size:16px;line-height:1}.auth-panel-home-link:hover{color:#07552c;transform:translateX(-3px)}.auth-panel-home-link:hover span{background:#e4f3e3}
 @media(max-width:980px){.auth-panel-home-link{display:inline-flex}}
+
+.app-body .bar-chart--comparison{align-items:flex-end;gap:30px;padding-top:24px}.app-body .bar-chart--comparison .bar--comparison{flex:1 1 120px;min-width:120px;gap:7px}.app-body .bar-chart--comparison .comparison-bars{display:flex;align-items:stretch;justify-content:center;gap:12px;width:100%;height:164px}.app-body .bar-chart--comparison .comparison-bar{display:grid;grid-template-rows:20px 1fr;flex:0 0 46px;align-items:end;height:100%}.app-body .bar-chart--comparison .comparison-bar b{align-self:end;min-height:16px;color:#202020;font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap}.app-body .bar-chart--comparison .comparison-bar i{display:block;grid-row:2;align-self:end;width:40px;min-height:6px;margin:0;border-radius:4px 4px 0 0;box-shadow:none}.app-body .bar-chart--comparison .comparison-bar .bar-tanam{background:#4d7db0}.app-body .bar-chart--comparison .comparison-bar .bar-panen{background:#73bd51}.app-body .bar-chart--comparison .bar--comparison>span{min-height:14px;color:#202020;font-size:11px;font-weight:700}
 
 /* Keep the desktop sidebar tidy while allowing every navigation item to remain reachable. */
 @media(min-width:981px){
@@ -1028,3 +1100,24 @@ body.public-directory{display:block;min-height:0;padding:0!important}
     .app-body .sidebar-footer{position:static;flex:0 0 auto;margin:10px 2px 0;padding:12px 0 0;border-top:1px solid #ffffff26;background:transparent}
     .app-body .sidebar-footer .nav-link{padding:10px 15px}
 }
+
+/* Final landing-wordmark sizing: keep the flower fully visible and the description legible. */
+.landing-brand__icon{width:86px;height:76px}
+.landing-brand__wordmark{gap:7px}
+.landing-brand__wordmark strong{font-size:32px;letter-spacing:-.06em}
+.landing-brand__wordmark small{display:block;max-width:255px;font:700 11px/1.32 'DM Sans',sans-serif;letter-spacing:0}
+
+@media(max-width:540px){
+    .public-home .landing-header{min-height:102px;padding-top:13px;padding-bottom:13px}
+    .landing-brand{gap:12px}
+    .landing-brand__icon{width:80px;height:70px}
+    .landing-brand__wordmark strong{font-size:28px}
+    .landing-brand__wordmark small{max-width:205px;font-size:10px;line-height:1.3}
+}
+
+/* Keep the loading emblem as prominent as the original loading icon. */
+.page-loader__mark.simantap-mark{width:112px;height:112px;background-size:78px 74px}
+
+/* Login keeps the complete flower line art while removing only its square background. */
+.auth-wordmark__icon{background-color:transparent;background-image:url('/images/simantap-mark-outline-white.png');background-position:center;background-repeat:no-repeat;background-size:contain}
+.auth-wordmark--green .auth-wordmark__icon{background-image:url('/images/simantap-mark-outline-green.png')}

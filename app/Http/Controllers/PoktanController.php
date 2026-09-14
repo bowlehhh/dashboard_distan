@@ -38,6 +38,8 @@ class PoktanController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         Poktan::create($this->validated($request));
 
         return redirect()->route('poktans.index')->with('success', 'Data kelompok tani berhasil ditambahkan.');
@@ -56,6 +58,8 @@ class PoktanController extends Controller
      */
     public function edit(Poktan $poktan): View
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Akun Anda hanya dapat melihat data kelompok tani.');
+
         return view('poktans.form', compact('poktan'));
     }
 
@@ -64,6 +68,8 @@ class PoktanController extends Controller
      */
     public function update(Request $request, Poktan $poktan): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Akun Anda hanya dapat melihat data kelompok tani.');
+
         $poktan->update($this->validated($request));
 
         return redirect()->route('poktans.index')->with('success', 'Data kelompok tani diperbarui.');

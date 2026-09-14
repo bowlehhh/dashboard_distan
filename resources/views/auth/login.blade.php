@@ -11,13 +11,13 @@
     <main class="auth-shell">
         <section class="auth-visual">
             <div class="auth-pattern" aria-hidden="true">
-                <svg class="auth-pattern__mark auth-pattern__mark--one" viewBox="0 0 48 48" fill="none"><path d="M24 43c-11 0-19-7-19-18 0-8 7-15 19-20 12 5 19 12 19 20 0 11-8 18-19 18Z" stroke="currentColor" stroke-width="3"/><path d="M24 40V18m0 10c-5 0-9-3-11-8m11 4c5 0 9-3 11-8" stroke="currentColor" stroke-linecap="round" stroke-width="3"/></svg>
-                <svg class="auth-pattern__mark auth-pattern__mark--two" viewBox="0 0 48 48" fill="none"><path d="M24 43c-11 0-19-7-19-18 0-8 7-15 19-20 12 5 19 12 19 20 0 11-8 18-19 18Z" stroke="currentColor" stroke-width="3"/><path d="M24 40V18m0 10c-5 0-9-3-11-8m11 4c5 0 9-3 11-8" stroke="currentColor" stroke-linecap="round" stroke-width="3"/></svg>
+                <x-simantap-mark class="auth-pattern__mark auth-pattern__mark--one" />
+                <x-simantap-mark class="auth-pattern__mark auth-pattern__mark--two" />
             </div>
             <div class="auth-visual__content">
                 <div class="auth-wordmark auth-wordmark--light" aria-label="SIMANTAP">
-                    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 43c-11 0-19-7-19-18 0-8 7-15 19-20 12 5 19 12 19 20 0 11-8 18-19 18Z" stroke="currentColor" stroke-width="3"/><path d="M24 40V18m0 10c-5 0-9-3-11-8m11 4c5 0 9-3 11-8" stroke="currentColor" stroke-linecap="round" stroke-width="3"/></svg>
-                    <span>SIMANTAP<small>Sistem Informasi Alsintan<br>Terpadu, Modern, dan Transparan</small></span>
+                    <x-simantap-mark class="auth-wordmark__icon" />
+                    <span>SIMANTAP<small>Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</small></span>
                 </div>
                 <p class="auth-kicker">SISTEM INFORMASI PERTANIAN</p>
                 <h1>Data pertanian yang lebih terarah.</h1>
@@ -34,8 +34,8 @@
             <div class="auth-panel__inner">
                 <div class="auth-panel__identity">
                     <div class="auth-wordmark auth-wordmark--green" aria-label="SIMANTAP">
-                        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 43c-11 0-19-7-19-18 0-8 7-15 19-20 12 5 19 12 19 20 0 11-8 18-19 18Z" stroke="currentColor" stroke-width="3"/><path d="M24 40V18m0 10c-5 0-9-3-11-8m11 4c5 0 9-3 11-8" stroke="currentColor" stroke-linecap="round" stroke-width="3"/></svg>
-                        <span>SIMANTAP<small>Sistem Informasi Alsintan<br>Terpadu, Modern, dan Transparan</small></span>
+                        <x-simantap-mark class="auth-wordmark__icon" />
+                        <span>SIMANTAP<small>Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</small></span>
                     </div>
                     <img src="{{ asset('images/kutai-barat-emblem.png') }}" alt="Lambang Kabupaten Kutai Barat">
                 </div>

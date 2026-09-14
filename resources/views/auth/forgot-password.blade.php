@@ -13,11 +13,8 @@
         <div class="auth-pattern" aria-hidden="true"></div>
         <div class="auth-visual__content">
             <a class="auth-wordmark auth-wordmark--light" href="{{ route('home') }}">
-                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                    <path d="M24 43c-11 0-19-7-19-18 0-8 7-15 19-20 12 5 19 12 19 20 0 11-8 18-19 18Z" stroke="currentColor" stroke-width="3"/>
-                    <path d="M24 40V18m0 10c-5 0-9-3-11-8m11 4c5 0 9-3 11-8" stroke="currentColor" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-                <span>SIMANTAP<small>Sistem Informasi Alsintan<br>Terpadu, Modern, dan Transparan</small></span>
+                <x-simantap-mark class="auth-wordmark__icon" />
+                <span>SIMANTAP<small>Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</small></span>
             </a>
             <p class="auth-kicker">SISTEM INFORMASI PERTANIAN</p>
             <h1>Pulihkan akses akun Anda.</h1>

@@ -33,8 +33,9 @@ Route::controller(PublicInformationController::class)->group(function () {
     Route::get('/data-alsintan', 'alsintans')->name('public.alsintans');
     Route::get('/data-saprodi', 'saprodis')->name('public.saprodis');
     Route::get('/tanaman-pangan', 'crops')->name('public.crops');
-    Route::get('/laporan-publik', 'reports')->name('public.reports');
 });
+
+Route::redirect('/laporan-publik', '/tanaman-pangan')->name('public.reports');
 
 Route::middleware('guest')->group(function () {
     Route::get('/masuk', [AuthController::class, 'create'])->name('login');
@@ -48,11 +49,13 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('alsintans', AlsintanController::class)->middleware('role:admin,operator,ppl');
-    Route::middleware('role:admin,operator')->group(function () {
+    Route::resource('alsintans', AlsintanController::class)->middleware('role:admin,pimpinan,penyuluh');
+    Route::resource('crops', CropController::class)->middleware('role:admin,pimpinan,penyuluh');
+    Route::middleware('role:admin,pimpinan')->group(function () {
         Route::resource('poktans', PoktanController::class);
         Route::resource('saprodis', SaprodiController::class);
-        Route::resource('crops', CropController::class);
+    });
+    Route::middleware('role:admin')->group(function () {
         Route::get('/laporan', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/laporan/{report}/ekspor', [ReportController::class, 'download'])->whereIn('report', ['alsintan', 'saprodi', 'tanaman-pangan', 'poktan'])->name('reports.download');
     });
@@ -62,7 +65,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::get('/pengaturan/backup', [SettingsController::class, 'downloadBackup'])->name('settings.backup.download');
         Route::post('/pengaturan/backup/pulihkan', [SettingsController::class, 'restoreBackup'])->name('settings.backup.restore');
     });
-    Route::middleware('role:admin,operator')->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::get('/pengaturan', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('/pengaturan/tampilan', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
         Route::put('/pengaturan/keamanan', [SettingsController::class, 'updateSecurity'])->name('settings.security.update');

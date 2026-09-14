@@ -12,7 +12,7 @@ class Alsintan extends Model
     /** @use HasFactory<AlsintanFactory> */
     use HasFactory;
 
-    protected $fillable = ['type', 'brand_type', 'inventory_number', 'poktan_id', 'district', 'village', 'procurement_year', 'condition', 'usage_status', 'photo_path', 'notes', 'latitude', 'longitude'];
+    protected $fillable = ['type', 'brand_type', 'inventory_number', 'poktan_id', 'district', 'village', 'procurement_year', 'condition', 'usage_status', 'photo_path', 'google_maps_url', 'notes'];
 
     public function poktan(): BelongsTo
     {

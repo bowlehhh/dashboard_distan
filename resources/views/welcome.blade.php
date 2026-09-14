@@ -14,7 +14,8 @@
         @endif
         <header class="landing-header">
             <a class="landing-brand" href="{{ route('home') }}" aria-label="SIMANTAP, halaman utama">
-                <img class="landing-brand__image" src="{{ asset('images/simantap-logo-reference.png') }}" alt="SIMANTAP — Sistem Informasi Alsintan Terpadu, Modern, dan Transparan">
+                <x-simantap-mark class="landing-brand__icon" />
+                <span class="landing-brand__wordmark"><strong>SIMANTAP</strong><small>Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</small></span>
             </a>
 
             <a class="landing-mobile-login landing-login" href="{{ auth()->check() ? route('dashboard') : route('login') }}">{{ auth()->check() ? 'Dashboard' : 'Masuk' }}</a>
@@ -25,7 +26,7 @@
                 <a href="{{ route('public.poktans') }}">Data Poktan</a>
                 <a href="{{ route('public.alsintans') }}">Data Alsintan</a>
                 <a href="{{ route('public.saprodis') }}">Data Saprodi</a>
-                <a href="{{ route('public.reports') }}">Laporan</a>
+                <a href="{{ route('public.crops') }}">Tanaman Pangan</a>
                 <a class="landing-login" href="{{ auth()->check() ? route('dashboard') : route('login') }}">{{ auth()->check() ? 'Dashboard' : 'Masuk' }}</a>
             </nav>
             <button class="landing-menu-backdrop" type="button" data-landing-menu-backdrop aria-label="Tutup menu navigasi"></button>

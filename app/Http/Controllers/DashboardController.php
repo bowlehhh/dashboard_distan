@@ -42,6 +42,7 @@ class DashboardController extends Controller
                     'edit_url' => auth()->user()->hasRole('admin') ? route('poktans.edit', $item) : null,
                 ])))
             ->merge($this->whenType($type, 'Saprodi', fn () => Saprodi::query()
+                ->with('poktan')
                 ->latest()
                 ->take(2)
                 ->get()
@@ -50,22 +51,22 @@ class DashboardController extends Controller
                     'name' => $item->name,
                     'district' => '—',
                     'village' => '—',
-                    'poktan' => '—',
+                    'poktan' => $item->poktan?->name ?? '—',
                     'commodity' => '—',
                     'columns' => [
-                        'Kategori' => $item->category,
-                        'Stok' => number_format((float) $item->stock, 2, ',', '.'),
+                        'Nama Poktan' => $item->poktan?->name ?? '—',
+                        'Jumlah Diserahkan' => number_format((float) $item->quantity_distributed, 2, ',', '.'),
                         'Satuan' => $item->unit,
-                        'Batas Minimum' => (float) $item->minimum_stock > 0 ? number_format((float) $item->minimum_stock, 2, ',', '.') : null,
+                        'Tahun Diserahkan' => $item->distributed_year,
                     ],
                     'coordinates' => '—',
-                    'status' => $item->stock_status,
+                    'status' => 'Diserahkan',
                     'photo' => $item->photo_path ? asset('storage/'.$item->photo_path) : null,
                     'recorded_at' => $item->created_at,
                     'show_url' => route('saprodis.show', $item),
                     'edit_url' => auth()->user()->hasRole('admin') ? route('saprodis.edit', $item) : null,
                 ])))
-            ->merge($this->whenType($type, 'Tanaman Pangan', fn () => Crop::with('poktan')
+            ->merge($this->whenType($type, 'Tanaman Pangan', fn () => Crop::query()
                 ->latest()
                 ->take(2)
                 ->get()
@@ -73,14 +74,13 @@ class DashboardController extends Controller
                     'type' => 'Tanaman Pangan',
                     'name' => $item->commodity,
                     'district' => $item->district,
-                    'village' => $item->poktan?->village ?? '—',
-                    'poktan' => $item->poktan?->name ?? '—',
+                    'village' => '—',
+                    'poktan' => '—',
                     'commodity' => $item->commodity,
                     'columns' => [
                         'Luas Tanam' => rtrim(rtrim(number_format((float) $item->planted_area, 2, ',', '.'), '0'), ',').' Ha',
                         'Luas Panen' => rtrim(rtrim(number_format((float) $item->harvested_area, 2, ',', '.'), '0'), ',').' Ha',
-                        'Produksi' => rtrim(rtrim(number_format((float) $item->production, 2, ',', '.'), '0'), ','),
-                        'Satuan' => $item->unit,
+                        'Produksi' => $item->production,
                         'Periode' => $item->period,
                         'Keterangan' => $item->notes,
                     ],
@@ -89,7 +89,7 @@ class DashboardController extends Controller
                     'photo' => null,
                     'recorded_at' => $item->created_at,
                     'show_url' => route('crops.show', $item),
-                    'edit_url' => auth()->user()->hasRole('admin') ? route('crops.edit', $item) : null,
+                    'edit_url' => auth()->user()->hasRole('admin', 'penyuluh') ? route('crops.edit', $item) : null,
                 ])))
             ->merge($this->whenType($type, 'Alsintan', fn () => (clone $alsintans)
                 ->with('poktan')
@@ -109,12 +109,12 @@ class DashboardController extends Controller
                         'Tahun' => (string) $item->procurement_year,
                         'Penggunaan' => $item->usage_status,
                     ],
-                    'coordinates' => $item->latitude !== null && $item->longitude !== null ? 'Lat: '.$item->latitude.' | Long: '.$item->longitude : '—',
-                    'status' => $item->condition,
+                    'coordinates' => $item->google_maps_url,
+                    'status' => (string) $item->procurement_year,
                     'photo' => $item->photo_path ? asset('storage/'.$item->photo_path) : null,
                     'recorded_at' => $item->created_at,
                     'show_url' => route('alsintans.show', $item),
-                    'edit_url' => auth()->user()->hasRole('admin') ? route('alsintans.edit', $item) : null,
+                    'edit_url' => auth()->user()->hasRole('admin', 'penyuluh') ? route('alsintans.edit', $item) : null,
                 ])))
             ->sortByDesc(fn (array $item) => $item['recorded_at'])
             ->take(8)
@@ -136,11 +136,10 @@ class DashboardController extends Controller
             'Saprodi' => [
                 ['key' => 'no', 'label' => 'No'],
                 ['key' => 'name', 'label' => 'Nama Saprodi'],
-                ['key' => 'field', 'field' => 'Kategori', 'label' => 'Kategori'],
-                ['key' => 'field', 'field' => 'Stok', 'label' => 'Stok'],
+                ['key' => 'field', 'field' => 'Nama Poktan', 'label' => 'Nama Poktan'],
+                ['key' => 'field', 'field' => 'Jumlah Diserahkan', 'label' => 'Jumlah Diserahkan'],
                 ['key' => 'field', 'field' => 'Satuan', 'label' => 'Satuan'],
-                ['key' => 'field', 'field' => 'Batas Minimum', 'label' => 'Batas Minimum'],
-                ['key' => 'status', 'label' => 'Status'],
+                ['key' => 'field', 'field' => 'Tahun Diserahkan', 'label' => 'Tahun Diserahkan'],
                 ['key' => 'photo', 'label' => 'Foto'],
                 ['key' => 'actions', 'label' => 'Aksi'],
             ],
@@ -148,12 +147,9 @@ class DashboardController extends Controller
                 ['key' => 'no', 'label' => 'No'],
                 ['key' => 'name', 'label' => 'Komoditas'],
                 ['key' => 'district', 'label' => 'Kecamatan'],
-                ['key' => 'village', 'label' => 'Kampung / Desa'],
-                ['key' => 'poktan', 'label' => 'Kelompok Tani'],
                 ['key' => 'field', 'field' => 'Luas Tanam', 'label' => 'Luas Tanam'],
                 ['key' => 'field', 'field' => 'Luas Panen', 'label' => 'Luas Panen'],
                 ['key' => 'field', 'field' => 'Produksi', 'label' => 'Produksi'],
-                ['key' => 'field', 'field' => 'Satuan', 'label' => 'Satuan'],
                 ['key' => 'field', 'field' => 'Periode', 'label' => 'Periode'],
                 ['key' => 'field', 'field' => 'Keterangan', 'label' => 'Keterangan'],
                 ['key' => 'photo', 'label' => 'Foto'],
@@ -169,8 +165,8 @@ class DashboardController extends Controller
                 ['key' => 'field', 'field' => 'No. Inventaris', 'label' => 'No. Inventaris'],
                 ['key' => 'field', 'field' => 'Tahun', 'label' => 'Tahun'],
                 ['key' => 'field', 'field' => 'Penggunaan', 'label' => 'Penggunaan'],
-                ['key' => 'status', 'label' => 'Kondisi'],
-                ['key' => 'coordinates', 'label' => 'Koordinat'],
+                ['key' => 'status', 'label' => 'Tahun Diserahkan'],
+                ['key' => 'coordinates', 'label' => 'Google Maps'],
                 ['key' => 'photo', 'label' => 'Foto'],
                 ['key' => 'actions', 'label' => 'Aksi'],
             ],
@@ -202,7 +198,6 @@ class DashboardController extends Controller
                 ['label' => 'Tanaman Pangan', 'value' => Crop::distinct('commodity')->count('commodity'), 'caption' => 'Komoditas', 'icon' => '◆'],
             ],
             'districtData' => (clone $alsintans)->selectRaw('district, count(*) as total')->groupBy('district')->orderByDesc('total')->get(),
-            'conditionData' => (clone $alsintans)->select('condition')->selectRaw('count(*) as total')->groupBy('condition')->get()->keyBy('condition'),
             'recentData' => $recentData,
         ]);
     }

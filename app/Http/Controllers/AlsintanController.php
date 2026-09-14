@@ -18,7 +18,7 @@ class AlsintanController extends Controller
      */
     public function index(Request $request): View
     {
-        $alsintans = Alsintan::with('poktan')->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('type', 'like', "%{$search}%")->orWhere('brand_type', 'like', "%{$search}%")->orWhere('inventory_number', 'like', "%{$search}%")))->when($request->district, fn ($query, $district) => $query->where('district', $district))->when($request->condition, fn ($query, $condition) => $query->where('condition', $condition))->latest()->paginate(100)->withQueryString();
+        $alsintans = Alsintan::with('poktan')->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('type', 'like', "%{$search}%")->orWhere('brand_type', 'like', "%{$search}%")->orWhere('inventory_number', 'like', "%{$search}%")))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest()->paginate(100)->withQueryString();
 
         return view('alsintans.index', compact('alsintans'));
     }
@@ -38,6 +38,8 @@ class AlsintanController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         Alsintan::create($this->validated($request));
 
         return redirect()->route('alsintans.index')->with('success', 'Data alsintan berhasil ditambahkan.');
@@ -56,6 +58,12 @@ class AlsintanController extends Controller
      */
     public function edit(Alsintan $alsintan): View
     {
+        abort_unless(auth()->user()->hasRole('admin', 'penyuluh'), 403, 'Akun Anda hanya dapat melihat data alsintan.');
+
+        if (auth()->user()->hasRole('penyuluh')) {
+            return view('alsintans.field-form', compact('alsintan'));
+        }
+
         return view('alsintans.form', ['alsintan' => $alsintan, 'poktans' => Poktan::query()->where('status', 'Aktif')->orderBy('name')->get()]);
     }
 
@@ -64,7 +72,9 @@ class AlsintanController extends Controller
      */
     public function update(Request $request, Alsintan $alsintan): RedirectResponse
     {
-        $data = $this->validated($request, $alsintan);
+        abort_unless(auth()->user()->hasRole('admin', 'penyuluh'), 403, 'Akun Anda hanya dapat melihat data alsintan.');
+
+        $data = auth()->user()->hasRole('penyuluh') ? $this->validatedFieldUpdate($request) : $this->validated($request, $alsintan);
         $oldPhotoPath = $alsintan->photo_path;
         $alsintan->update($data);
 
@@ -92,10 +102,23 @@ class AlsintanController extends Controller
 
     private function validated(Request $request, ?Alsintan $alsintan = null): array
     {
-        $data = $request->validate(['type' => ['required', 'string', 'max:120'], 'brand_type' => ['required', 'string', 'max:120'], 'inventory_number' => ['required', 'string', 'max:80', $this->inventoryNumberRule($alsintan)], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'village' => ['required', 'string', 'max:120'], 'procurement_year' => ['required', 'integer', 'between:1950,'.now()->year], 'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'usage_status' => ['required', 'string', 'max:100'], 'photo' => ['nullable', 'image', 'max:2048'], 'notes' => ['nullable', 'string'], 'latitude' => ['nullable', 'numeric', 'between:-90,90'], 'longitude' => ['nullable', 'numeric', 'between:-180,180']]);
+        $data = $request->validate(['type' => ['required', 'string', 'max:120'], 'brand_type' => ['required', 'string', 'max:120'], 'inventory_number' => ['required', 'string', 'max:80', $this->inventoryNumberRule($alsintan)], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'village' => ['required', 'string', 'max:120'], 'procurement_year' => ['required', 'integer', 'between:1950,'.now()->year], 'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'usage_status' => ['required', 'string', 'max:100'], 'photo' => ['nullable', 'image', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps'], 'notes' => ['nullable', 'string']]);
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('alsintan', 'public');
         }
+        unset($data['photo']);
+
+        return $data;
+    }
+
+    private function validatedFieldUpdate(Request $request): array
+    {
+        $data = $request->validate(['condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'photo' => ['nullable', 'image', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps']]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('alsintan', 'public');
+        }
+
         unset($data['photo']);
 
         return $data;

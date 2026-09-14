@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Crop;
-use App\Models\Poktan;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,8 +14,8 @@ class CropController extends Controller
      */
     public function index(Request $request): View
     {
-        $crops = Crop::with('poktan')->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest('period')->paginate(100)->withQueryString();
-        $summary = Crop::selectRaw('commodity, sum(planted_area) as planted_area, sum(production) as production')->groupBy('commodity')->orderByDesc('planted_area')->get();
+        $crops = Crop::query()->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest('period')->paginate(100)->withQueryString();
+        $summary = Crop::query()->selectRaw('commodity, sum(planted_area) as planted_area, sum(harvested_area) as harvested_area')->groupBy('commodity')->orderByDesc('planted_area')->get();
 
         return view('crops.index', compact('crops', 'summary'));
     }
@@ -28,7 +27,7 @@ class CropController extends Controller
     {
         abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
 
-        return view('crops.form', ['crop' => new Crop, 'poktans' => Poktan::orderBy('name')->get()]);
+        return view('crops.form', ['crop' => new Crop]);
     }
 
     /**
@@ -36,6 +35,8 @@ class CropController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         Crop::create($this->validated($request));
 
         return redirect()->route('crops.index')->with('success', 'Data tanaman pangan berhasil ditambahkan.');
@@ -54,7 +55,13 @@ class CropController extends Controller
      */
     public function edit(Crop $crop): View
     {
-        return view('crops.form', ['crop' => $crop, 'poktans' => Poktan::orderBy('name')->get()]);
+        abort_unless(auth()->user()->hasRole('admin', 'penyuluh'), 403, 'Akun Anda hanya dapat melihat data tanaman pangan.');
+
+        if (auth()->user()->hasRole('penyuluh')) {
+            return view('crops.harvest-form', compact('crop'));
+        }
+
+        return view('crops.form', compact('crop'));
     }
 
     /**
@@ -62,7 +69,9 @@ class CropController extends Controller
      */
     public function update(Request $request, Crop $crop): RedirectResponse
     {
-        $crop->update($this->validated($request));
+        abort_unless(auth()->user()->hasRole('admin', 'penyuluh'), 403, 'Akun Anda hanya dapat melihat data tanaman pangan.');
+
+        $crop->update(auth()->user()->hasRole('penyuluh') ? $this->validatedHarvest($request) : $this->validated($request));
 
         return redirect()->route('crops.index')->with('success', 'Data tanaman pangan diperbarui.');
     }
@@ -80,6 +89,11 @@ class CropController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate(['commodity' => ['required', 'string', 'max:120'], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'planted_area' => ['required', 'numeric', 'min:0'], 'harvested_area' => ['required', 'numeric', 'min:0'], 'production' => ['required', 'numeric', 'min:0'], 'unit' => ['required', 'string', 'max:40'], 'period' => ['required', 'string', 'max:40'], 'notes' => ['nullable', 'string']]);
+        return $request->validate(['commodity' => ['required', 'string', 'max:120'], 'district' => ['required', 'string', 'max:120'], 'planted_area' => ['required', 'numeric', 'min:0'], 'harvested_area' => ['required', 'numeric', 'min:0'], 'production' => ['required', 'string', 'max:100'], 'period' => ['required', 'string', 'max:40'], 'notes' => ['nullable', 'string']]);
+    }
+
+    private function validatedHarvest(Request $request): array
+    {
+        return $request->validate(['harvested_area' => ['required', 'numeric', 'min:0'], 'production' => ['required', 'string', 'max:100'], 'period' => ['required', 'string', 'max:40'], 'notes' => ['nullable', 'string']]);
     }
 }

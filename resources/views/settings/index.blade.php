@@ -3,7 +3,7 @@
         @if(auth()->user()->hasRole('admin'))
             <a href="#profil">Profil Instansi</a><a href="#akses">Hak Akses</a><a href="#backup">Backup Data</a>
         @endif
-        @if(auth()->user()->hasRole('admin', 'operator'))
+        @if(auth()->user()->hasRole('admin'))
             <a href="#tampilan">Tampilan</a><a href="#keamanan">Keamanan Akun</a>
         @endif
     </nav>
@@ -27,7 +27,7 @@
 
         <article class="settings-card" id="akses">
             <div class="settings-card__heading"><i>⌘</i><div><h2>Manajemen Hak Akses</h2><p>Atur peran, status aktif, dan akun setiap pengguna.</p></div></div>
-            <div class="settings-card__action"><p>Pengaturan peran Admin, Operator, dan Penyuluh dikelola dari halaman Manajemen Akun.</p><a class="btn btn-outline" href="{{ route('users.index') }}">Kelola Pengguna <span>→</span></a></div>
+            <div class="settings-card__action"><p>Pengaturan peran Admin, Pimpinan, dan Penyuluh dikelola dari halaman Manajemen Akun.</p><a class="btn btn-outline" href="{{ route('users.index') }}">Kelola Pengguna <span>→</span></a></div>
         </article>
 
         <article class="settings-card" id="backup">

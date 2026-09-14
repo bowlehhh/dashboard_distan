@@ -13,9 +13,9 @@ class UserControllerTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($admin)->post(route('users.store'), [
-            'name' => 'Operator Baru',
-            'email' => 'operator.baru@example.test',
-            'role' => 'operator',
+            'name' => 'Penyuluh Baru',
+            'email' => 'penyuluh.baru@example.test',
+            'role' => 'penyuluh',
             'unit_kerja' => 'Bidang Alsintan',
             'is_active' => '1',
             'password' => 'password-baru',
@@ -23,11 +23,11 @@ class UserControllerTest extends TestCase
         ]);
 
         $response->assertRedirect(route('users.index'));
-        $user = User::query()->where('email', 'operator.baru@example.test')->firstOrFail();
+        $user = User::query()->where('email', 'penyuluh.baru@example.test')->firstOrFail();
         $this->assertTrue(Hash::check('password-baru', $user->password));
 
         $this->post(route('login.store'), [
-            'email' => 'operator.baru@example.test',
+            'email' => 'penyuluh.baru@example.test',
             'password' => 'password-baru',
         ])
             ->assertRedirect(route('dashboard'))

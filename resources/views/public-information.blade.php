@@ -12,7 +12,8 @@
     <div class="public-directory-shell {{ $statistic === 0 ? 'public-directory-shell--empty' : '' }}">
     <header class="directory-header">
         <a class="directory-brand" href="{{ route('home') }}" aria-label="SIMANTAP, halaman utama">
-            <img src="{{ asset('images/simantap-logo-reference.png') }}" alt="SIMANTAP — Sistem Informasi Alsintan Terpadu, Modern, dan Transparan">
+            <x-simantap-mark class="directory-brand__icon" />
+            <span class="directory-brand__wordmark"><strong>SIMANTAP</strong><small>Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</small></span>
         </a>
 
         <button class="directory-menu-toggle" type="button" data-directory-menu-toggle aria-expanded="false" aria-controls="directory-menu" aria-label="Buka menu informasi publik">☰</button>
@@ -21,7 +22,7 @@
             <a class="{{ request()->routeIs('public.poktans') ? 'is-active' : '' }}" href="{{ route('public.poktans') }}">Data Poktan</a>
             <a class="{{ request()->routeIs('public.alsintans') ? 'is-active' : '' }}" href="{{ route('public.alsintans') }}">Data Alsintan</a>
             <a class="{{ request()->routeIs('public.saprodis') ? 'is-active' : '' }}" href="{{ route('public.saprodis') }}">Saprodi</a>
-            <a class="{{ request()->routeIs('public.reports') ? 'is-active' : '' }}" href="{{ route('public.reports') }}">Laporan</a>
+            <a class="{{ request()->routeIs('public.crops') ? 'is-active' : '' }}" href="{{ route('public.crops') }}">Tanaman Pangan</a>
             <a class="directory-login" href="{{ auth()->check() ? route('dashboard') : route('login') }}">{{ auth()->check() ? 'Dashboard' : 'Masuk' }}</a>
         </nav>
     </header>
@@ -88,10 +89,10 @@
                                         @foreach ($columns as $index => $column)
                                             @php
                                                 $iconKey = match (true) {
-                                                    request()->routeIs('public.alsintans') => ['tractor', 'tag', 'pin', 'condition'][$index] ?? 'data',
+                                                    request()->routeIs('public.alsintans') => ['tractor', 'tag', 'pin', 'data'][$index] ?? 'data',
                                                     request()->routeIs('public.poktans') => ['group', 'pin', 'leaf', 'members'][$index] ?? 'data',
-                                                    request()->routeIs('public.saprodis') => ['bag', 'tag', 'stock', 'unit'][$index] ?? 'data',
-                                                    request()->routeIs('public.crops') => ['leaf', 'pin', 'field', 'harvest'][$index] ?? 'data',
+                                                    request()->routeIs('public.saprodis') => ['bag', 'group', 'stock', 'unit', 'data'][$index] ?? 'data',
+                                                    request()->routeIs('public.crops') => ['leaf', 'pin', 'field', 'harvest', 'bag', 'data'][$index] ?? 'data',
                                                     default => ['chart', 'data'][$index] ?? 'data',
                                                 };
                                             @endphp
@@ -106,9 +107,6 @@
                                                             @break
                                                         @case('pin')
                                                             <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2" stroke="currentColor" stroke-width="1.8"/></svg>
-                                                            @break
-                                                        @case('condition')
-                                                            <svg viewBox="0 0 24 24" fill="none"><path d="M4 17a8 8 0 0 1 16 0M12 17l4-5M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 16v2m12-2v2" stroke="currentColor" stroke-width="1.8"/></svg>
                                                             @break
                                                         @case('group')
                                                         @case('members')
@@ -202,53 +200,28 @@
                 </aside>
             </div>
 
-            @if (count($recommendations) > 0)
-                <section class="directory-recommendations" aria-labelledby="recommendations-title">
+            <section class="directory-recommendations directory-year-cards" aria-labelledby="year-cards-title">
                 <div class="directory-recommendations__heading">
                     <div>
-                        <p>UNTUK PIMPINAN</p>
-                        <h2 id="recommendations-title">Rekomendasi singkat</h2>
+                        <p>TAHUN DATA TERBARU</p>
+                        <h2 id="year-cards-title">Ringkasan Tahun Data</h2>
                     </div>
-                    <details class="directory-recommendations__guide">
-                        <summary>Cara membaca</summary>
-                        <div class="directory-recommendations__guide-content">
-                            <p>Gunakan tiga langkah singkat ini untuk membaca ringkasan:</p>
-                            <ol>
-                                <li><strong>Prioritas tinggi</strong> ditangani lebih dulu.</li>
-                                <li>Lihat angka untuk mengetahui jumlah data yang perlu diperhatikan.</li>
-                                <li>Gunakan keterangan kartu sebagai arahan tindak lanjut.</li>
-                            </ol>
-                        </div>
-                    </details>
                 </div>
 
                 <div class="directory-recommendations__grid">
-                    @foreach ($recommendations as $recommendation)
-                        <article class="directory-recommendation directory-recommendation--{{ $recommendation['tone'] }}">
-                            <span class="directory-recommendation__icon" aria-hidden="true">
-                                @if ($recommendation['tone'] === 'danger')
-                                    !
-                                @elseif ($recommendation['tone'] === 'warning')
-                                    ↗
-                                @else
-                                    ✓
-                                @endif
-                            </span>
+                    @foreach ($yearCards as $yearCard)
+                        <article class="directory-recommendation directory-year-card">
+                            <span class="directory-recommendation__icon" aria-hidden="true">◷</span>
                             <div>
-                                <span class="directory-recommendation__label">{{ $recommendation['label'] }} · {{ number_format($recommendation['percentage'], 1, ',', '.') }}%</span>
-                                <h3>{{ $recommendation['title'] }}</h3>
-                                <p>{{ $recommendation['description'] }}</p>
+                                <span class="directory-recommendation__label">{{ $yearCard['label'] }}</span>
+                                <h3>{{ $yearCard['title'] }}</h3>
+                                <p>{{ $yearCard['description'] }}</p>
                             </div>
-                            <strong>{{ number_format($recommendation['value'], 0, ',', '.') }}</strong>
+                            <strong>{{ $yearCard['value'] }}</strong>
                         </article>
                     @endforeach
                 </div>
-                </section>
-            @else
-                <section class="directory-recommendations directory-recommendations--empty" aria-label="Rekomendasi pimpinan">
-                    <p>Rekomendasi pimpinan akan muncul setelah data tersedia.</p>
-                </section>
-            @endif
+            </section>
         </section>
     </main>
 

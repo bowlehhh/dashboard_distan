@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\SystemSetting;
+use App\PageRecommendationProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -24,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(PageRecommendationProvider $pageRecommendationProvider): void
     {
         RateLimiter::for('login', function (Request $request): Limit {
             $email = Str::lower((string) $request->input('email'));
@@ -38,7 +39,9 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(3)->by($email.'|'.$request->ip());
         });
 
-        View::composer('components.app-layout', function ($view): void {
+        View::composer('components.app-layout', function ($view) use ($pageRecommendationProvider): void {
+            $view->with('pageRecommendations', $pageRecommendationProvider->forIndexPage(request(), auth()->user()));
+
             if (! Schema::hasTable('system_settings')) {
                 return;
             }

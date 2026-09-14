@@ -189,15 +189,27 @@ class SettingsController extends Controller
     {
         $allowedColumns = [
             'poktans' => ['id', 'name', 'chairperson', 'district', 'village', 'commodity', 'member_count', 'phone', 'address', 'status', 'created_at', 'updated_at'],
-            'alsintans' => ['id', 'type', 'brand_type', 'inventory_number', 'poktan_id', 'district', 'village', 'procurement_year', 'condition', 'usage_status', 'photo_path', 'notes', 'latitude', 'longitude', 'created_at', 'updated_at'],
-            'saprodis' => ['id', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'notes', 'created_at', 'updated_at'],
-            'crops' => ['id', 'commodity', 'poktan_id', 'district', 'planted_area', 'harvested_area', 'production', 'unit', 'period', 'notes', 'created_at', 'updated_at'],
+            'alsintans' => ['id', 'type', 'brand_type', 'inventory_number', 'poktan_id', 'district', 'village', 'procurement_year', 'condition', 'usage_status', 'photo_path', 'google_maps_url', 'notes', 'created_at', 'updated_at'],
+            'saprodis' => ['id', 'name', 'poktan_id', 'unit', 'quantity_distributed', 'distributed_year', 'photo_path', 'notes', 'created_at', 'updated_at'],
+            'crops' => ['id', 'commodity', 'district', 'planted_area', 'harvested_area', 'production', 'period', 'notes', 'created_at', 'updated_at'],
             'system_settings' => ['id', 'key', 'value', 'created_at', 'updated_at'],
         ];
 
         foreach ($rows as $row) {
             if (! is_array($row)) {
                 continue;
+            }
+
+            if ($table === 'saprodis' && ! array_key_exists('quantity_distributed', $row)) {
+                $row['quantity_distributed'] = $row['stock'] ?? 0;
+            }
+
+            if ($table === 'alsintans' && ! array_key_exists('google_maps_url', $row) && isset($row['latitude'], $row['longitude'])) {
+                $row['google_maps_url'] = 'https://www.google.com/maps?q='.rawurlencode($row['latitude'].','.$row['longitude']);
+            }
+
+            if ($table === 'crops' && isset($row['unit'])) {
+                $row['production'] = trim($row['production'].' '.$row['unit']);
             }
 
             DB::table($table)->insert(collect($row)->only($allowedColumns[$table])->all());

@@ -7,33 +7,37 @@
 <div class="app-shell">
     <aside class="sidebar" data-sidebar>
         <a class="brand" href="{{ route('dashboard') }}">
-            <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M24 43c-11 0-19-7-19-18 0-8 7-15 19-20 12 5 19 12 19 20 0 11-8 18-19 18Z" stroke="currentColor" stroke-width="3"/><path d="M24 40V18m0 10c-5 0-9-3-11-8m11 4c5 0 9-3 11-8" stroke="currentColor" stroke-linecap="round" stroke-width="3"/></svg></span>
+            <x-simantap-mark class="brand-mark" />
             <span>SIMANTAP<small>Sistem Informasi Alsintan<br>Saprodi &amp; Tanaman Pangan</small></span>
         </a>
         <nav>
             <p class="nav-label">Menu Utama</p>
             <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><i class="nav-icon">⌂</i>Dashboard</a>
-            @if(auth()->user()->hasRole('admin', 'operator'))
+            @if(auth()->user()->hasRole('admin', 'pimpinan'))
                 <a class="nav-link {{ request()->routeIs('poktans.*') ? 'active' : '' }}" href="{{ route('poktans.index') }}"><i class="nav-icon">◉</i>Data Poktan</a>
             @endif
-            <a class="nav-link {{ request()->routeIs('alsintans.*') ? 'active' : '' }}" href="{{ route('alsintans.index') }}"><i class="nav-icon">▣</i>Data Alsintan</a>
-            @if(auth()->user()->hasRole('admin', 'operator'))
+            @if(auth()->user()->hasRole('admin', 'pimpinan', 'penyuluh'))
+                <a class="nav-link {{ request()->routeIs('alsintans.*') ? 'active' : '' }}" href="{{ route('alsintans.index') }}"><i class="nav-icon">▣</i>Data Alsintan</a>
+            @endif
+            @if(auth()->user()->hasRole('admin', 'pimpinan'))
                 <a class="nav-link {{ request()->routeIs('saprodis.*') ? 'active' : '' }}" href="{{ route('saprodis.index') }}"><i class="nav-icon">◇</i>Data Saprodi</a>
+            @endif
+            @if(auth()->user()->hasRole('admin', 'pimpinan', 'penyuluh'))
                 <a class="nav-link {{ request()->routeIs('crops.*') ? 'active' : '' }}" href="{{ route('crops.index') }}"><i class="nav-icon">◆</i>Tanaman Pangan</a>
             @endif
-            @if(auth()->user()->hasRole('admin', 'operator'))<a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}"><i class="nav-icon">▤</i>Laporan</a>@endif
+            @if(auth()->user()->hasRole('admin'))<a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}"><i class="nav-icon">▤</i>Laporan</a>@endif
             @if(auth()->user()->hasRole('admin'))
                 <p class="nav-label">Administrasi</p>
                 <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}"><i class="nav-icon">●</i>Manajemen Akun</a>
             @endif
-            @if(auth()->user()->hasRole('admin', 'operator'))
+            @if(auth()->user()->hasRole('admin'))
                 <a class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" href="{{ route('settings.index') }}"><i class="nav-icon">⚙</i>Pengaturan</a>
             @endif
         </nav>
         <div class="sidebar-footer"><form id="logout-form" method="post" action="{{ route('logout') }}">@csrf<button class="nav-link logout" type="button" data-logout-trigger><i class="nav-icon">↪</i>Keluar</button></form></div>
     </aside>
     <main class="main">
-        <header class="topbar"><button class="mobile-toggle" data-menu-toggle aria-label="Buka menu">☰</button><span class="topbar-brand">SIMANTAP</span><span class="topbar-title">Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</span><div class="topbar-profile">@if(! empty($institutionProfile['logo']))<img class="topbar-institution__logo" src="{{ asset('storage/'.$institutionProfile['logo']) }}" alt="Logo {{ $institutionProfile['name'] ?? 'instansi' }}">@else<i class="avatar">{{ strtoupper(str(auth()->user()->name)->substr(0, 1)) }}</i>@endif<div><strong>{{ $institutionProfile['name'] ?? 'SIMANTAP' }}</strong><small>{{ auth()->user()->name }} · {{ auth()->user()->role === 'ppl' ? 'Penyuluh Pertanian' : ucfirst(auth()->user()->role) }}</small></div></div></header>
+        <header class="topbar"><button class="mobile-toggle" data-menu-toggle aria-label="Buka menu">☰</button><span class="topbar-brand">SIMANTAP</span><span class="topbar-title">Sistem Informasi Alsintan, Saprodi, dan Tanaman Pangan</span><div class="topbar-profile">@if(! empty($institutionProfile['logo']))<img class="topbar-institution__logo" src="{{ asset('storage/'.$institutionProfile['logo']) }}" alt="Logo {{ $institutionProfile['name'] ?? 'instansi' }}">@else<i class="avatar">{{ strtoupper(str(auth()->user()->name)->substr(0, 1)) }}</i>@endif<div><strong>{{ $institutionProfile['name'] ?? 'SIMANTAP' }}</strong><small>{{ auth()->user()->name }} · {{ auth()->user()->role === 'penyuluh' ? 'Penyuluh Pertanian' : ucfirst(auth()->user()->role) }}</small></div></div></header>
         <section class="content">
             <div class="page-head"><div><h1>{{ $title }}</h1><p class="subhead">{{ $subtitle === 'Dinas Pertanian Kabupaten Kutai Barat' ? ($institutionProfile['name'] ?? $subtitle) : $subtitle }}</p></div>{{ $actions ?? '' }}</div>
             @if(session('success'))<div class="notice">✓ {{ session('success') }}</div>@endif
@@ -49,6 +53,20 @@
                 </div>
             @endif
             {{ $slot }}
+            @if($pageRecommendations !== [])
+                <section class="panel page-recommendations">
+                    <div class="panel-head"><h2>Rekomendasi untuk Pimpinan</h2></div>
+                    <div class="page-recommendations__grid">
+                        @foreach($pageRecommendations as $recommendation)
+                            <article>
+                                <strong>{{ $recommendation['title'] }}</strong>
+                                <span>{{ $recommendation['value'] }}</span>
+                                <p>{{ $recommendation['description'] }}</p>
+                            </article>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </section>
     </main>
     <div class="logout-modal" data-logout-modal hidden aria-hidden="true">

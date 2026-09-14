@@ -23,17 +23,13 @@ class SettingsControllerTest extends TestCase
         $response->assertDontSee('Notifikasi');
     }
 
-    public function test_operator_can_access_settings(): void
+    public function test_pimpinan_cannot_access_settings(): void
     {
-        $operator = User::factory()->create(['role' => 'operator']);
+        $pimpinan = User::factory()->create(['role' => 'pimpinan']);
 
-        $response = $this->actingAs($operator)->get(route('settings.index'));
+        $response = $this->actingAs($pimpinan)->get(route('settings.index'));
 
-        $response->assertOk();
-        $response->assertSee('Tampilan');
-        $response->assertSee('Keamanan Akun');
-        $response->assertDontSee('Profil Instansi');
-        $response->assertDontSee('Backup Data');
+        $response->assertForbidden();
     }
 
     public function test_admin_can_update_institution_profile(): void

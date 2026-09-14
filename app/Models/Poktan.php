@@ -19,8 +19,8 @@ class Poktan extends Model
         return $this->hasMany(Alsintan::class);
     }
 
-    public function crops(): HasMany
+    public function saprodis(): HasMany
     {
-        return $this->hasMany(Crop::class);
+        return $this->hasMany(Saprodi::class);
     }
 }

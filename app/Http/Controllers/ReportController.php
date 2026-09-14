@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ExcelReportExporter;
 use App\Models\Alsintan;
 use App\Models\Crop;
 use App\Models\Poktan;
@@ -21,12 +22,13 @@ class ReportController extends Controller
         ]]);
     }
 
-    public function download(string $report): StreamedResponse
+    public function download(string $report, ExcelReportExporter $excelReportExporter): StreamedResponse
     {
         $data = match ($report) {
             'alsintan' => [
                 'filename' => 'Rekap_Alsintan',
-                'headers' => ['Jenis Alsintan', 'Merk / Tipe', 'Nomor Inventaris', 'Poktan', 'Kecamatan', 'Kampung / Desa', 'Tahun Pengadaan', 'Kondisi', 'Status Penggunaan'],
+                'title' => 'Rekap Alsintan',
+                'headers' => ['Jenis Alsintan', 'Merk / Tipe', 'Nomor Inventaris', 'Poktan', 'Kecamatan', 'Kampung / Desa', 'Tahun Diserahkan', 'Kondisi', 'Status Penggunaan'],
                 'rows' => Alsintan::with('poktan')->orderBy('type')->get()->map(fn (Alsintan $item): array => [
                     $item->type,
                     $item->brand_type,
@@ -41,32 +43,33 @@ class ReportController extends Controller
             ],
             'saprodi' => [
                 'filename' => 'Rekap_Saprodi',
-                'headers' => ['Nama Saprodi', 'Kategori', 'Satuan', 'Stok', 'Batas Minimum', 'Keterangan'],
-                'rows' => Saprodi::orderBy('name')->get()->map(fn (Saprodi $item): array => [
+                'title' => 'Rekap Saprodi',
+                'headers' => ['Nama Saprodi', 'Nama Poktan', 'Satuan', 'Jumlah Diserahkan', 'Tahun Diserahkan', 'Keterangan'],
+                'rows' => Saprodi::with('poktan')->orderBy('name')->get()->map(fn (Saprodi $item): array => [
                     $item->name,
-                    $item->category,
+                    $item->poktan?->name ?? '',
                     $item->unit,
-                    number_format((float) $item->stock, 0, ',', '.'),
-                    $item->minimum_stock > 0 ? number_format((float) $item->minimum_stock, 0, ',', '.') : 0,
+                    number_format((float) $item->quantity_distributed, 0, ',', '.'),
+                    $item->distributed_year ?? '',
                     $item->notes ?? '',
                 ]),
             ],
             'tanaman-pangan' => [
                 'filename' => 'Rekap_Tanaman_Pangan',
-                'headers' => ['Komoditas', 'Poktan', 'Kecamatan', 'Luas Tanam (Ha)', 'Luas Panen (Ha)', 'Produksi', 'Satuan', 'Periode'],
-                'rows' => Crop::with('poktan')->orderBy('commodity')->get()->map(fn (Crop $item): array => [
+                'title' => 'Rekap Tanaman Pangan',
+                'headers' => ['Komoditas', 'Kecamatan', 'Luas Tanam (Ha)', 'Luas Panen (Ha)', 'Produksi', 'Periode'],
+                'rows' => Crop::orderBy('commodity')->get()->map(fn (Crop $item): array => [
                     $item->commodity,
-                    $item->poktan?->name ?? '',
                     $item->district,
                     number_format((float) $item->planted_area, 2, ',', '.'),
                     number_format((float) $item->harvested_area, 2, ',', '.'),
-                    number_format((float) $item->production, 0, ',', '.'),
-                    $item->unit,
+                    $item->production,
                     $item->period,
                 ]),
             ],
             'poktan' => [
                 'filename' => 'Data_Kelompok_Tani',
+                'title' => 'Data Kelompok Tani',
                 'headers' => ['Nama Poktan', 'Ketua', 'Kecamatan', 'Kampung / Desa', 'Komoditas', 'Jumlah Anggota', 'Kontak', 'Status'],
                 'rows' => Poktan::orderBy('name')->get()->map(fn (Poktan $item): array => [
                     $item->name,
@@ -81,30 +84,6 @@ class ReportController extends Controller
             ],
         };
 
-        // Create CSV content with proper formatting
-        $output = fopen('php://temp', 'r+');
-
-        // Write BOM for UTF-8 support in Excel
-        fwrite($output, "\xEF\xBB\xBF");
-
-        // Write headers
-        fputcsv($output, $data['headers']);
-
-        // Write data rows
-        foreach ($data['rows'] as $row) {
-            fputcsv($output, $row);
-        }
-
-        rewind($output);
-        $csvContent = stream_get_contents($output);
-        fclose($output);
-
-        // Return as CSV that Excel can open natively
-        return response()->streamDownload(function () use ($csvContent): void {
-            echo $csvContent;
-        }, $data['filename'].'-'.now()->format('Ymd-His').'.csv', [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename*="utf-8\'\''.$data['filename'].'-'.now()->format('Ymd-His').'.csv',
-        ]);
+        return $excelReportExporter->download($data['filename'], $data['title'], $data['headers'], $data['rows']);
     }
 }

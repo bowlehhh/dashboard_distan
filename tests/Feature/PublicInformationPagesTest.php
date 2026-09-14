@@ -19,7 +19,8 @@ class PublicInformationPagesTest extends TestCase
             ->assertSee('Data Poktan')
             ->assertSee('Data Alsintan')
             ->assertSee('Data Saprodi')
-            ->assertSee('Laporan')
+            ->assertSee('Tanaman Pangan')
+            ->assertDontSee('>Laporan<', false)
             ->assertSee('Masuk')
             ->assertDontSee('Pengguna')
             ->assertDontSee('Pengaturan');
@@ -60,7 +61,7 @@ class PublicInformationPagesTest extends TestCase
             ->assertDontSee('Poktan Nonaktif')
             ->assertSee('Aktif')
             ->assertDontSee('Nonaktif')
-            ->assertSee('Kelompok tani aktif');
+            ->assertSee('Kecamatan');
     }
 
     public function test_public_alsintan_page_paginates_rows_without_authentication(): void
@@ -70,11 +71,13 @@ class PublicInformationPagesTest extends TestCase
         $response = $this->get(route('public.alsintans'));
 
         $response->assertSee('Data Alsintan')
-            ->assertSee('Rekomendasi singkat')
-            ->assertSee('Rusak berat perlu ditangani')
-            ->assertSee('Baik')
-            ->assertSee('Rusak Ringan')
-            ->assertSee('Rusak Berat')
+            ->assertSee('Tahun Diserahkan')
+            ->assertDontSee('Rekomendasi singkat')
+            ->assertDontSee('Kondisi')
+            ->assertSee('Ringkasan Tahun Data')
+            ->assertSee('Poktan')
+            ->assertSee('Saprodi')
+            ->assertSee('Tanaman Pangan')
             ->assertSee('9')
             ->assertSee('page=2')
             ->assertSee('page=3');
@@ -100,12 +103,11 @@ class PublicInformationPagesTest extends TestCase
         $response->assertSee('Tanaman Pangan');
     }
 
-    public function test_public_report_page_renders_without_authentication(): void
+    public function test_public_report_url_redirects_to_the_crop_page(): void
     {
         $response = $this->get(route('public.reports'));
 
-        $response->assertSee('Laporan Pertanian')
-            ->assertSee('public-directory-shell--empty');
+        $response->assertRedirect(route('public.crops'));
     }
 
     private function seedAlsintans(int $count): void
@@ -118,7 +120,6 @@ class PublicInformationPagesTest extends TestCase
                 'district' => sprintf('Kecamatan %02d', $index),
                 'village' => sprintf('Desa %02d', $index),
                 'procurement_year' => 2020,
-                'condition' => 'Baik',
                 'usage_status' => 'Digunakan',
             ]);
         }

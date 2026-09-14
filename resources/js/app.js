@@ -1,18 +1,5 @@
 const appMenuToggle = document.querySelector('[data-menu-toggle]');
 const appSidebar = document.querySelector('[data-sidebar]');
-const saprodiCategorySelect = document.querySelector('[data-saprodi-category]');
-const customCategoryField = document.querySelector('[data-custom-category-field]');
-const customCategoryInput = document.querySelector('[data-custom-category-input]');
-
-const syncCustomCategoryField = () => {
-    const isCustomCategory = saprodiCategorySelect?.value === 'Lainnya';
-
-    customCategoryField?.toggleAttribute('hidden', ! isCustomCategory);
-    customCategoryInput?.toggleAttribute('required', isCustomCategory);
-};
-
-saprodiCategorySelect?.addEventListener('change', syncCustomCategoryField);
-syncCustomCategoryField();
 
 const closeAppSidebar = () => {
     appSidebar?.classList.remove('open');
@@ -122,6 +109,30 @@ window.addEventListener('resize', () => {
     if (window.innerWidth > 1024 && directoryNav?.classList.contains('is-open')) {
         closeDirectoryMenu();
     }
+});
+
+document.querySelectorAll('[data-current-location]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const input = button.closest('.field')?.querySelector('[data-location-input]');
+
+        if (! input || ! navigator.geolocation) {
+            window.alert('Lokasi perangkat tidak tersedia. Tempel link Google Maps secara manual.');
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Mengambil lokasi…';
+
+        navigator.geolocation.getCurrentPosition((position) => {
+            input.value = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+            button.disabled = false;
+            button.textContent = 'Ambil lokasi saat ini';
+        }, () => {
+            window.alert('Lokasi tidak dapat diambil. Pastikan izin lokasi diaktifkan pada perangkat.');
+            button.disabled = false;
+            button.textContent = 'Ambil lokasi saat ini';
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    });
 });
 const confirmationModal = document.createElement('div');
 confirmationModal.className = 'confirmation-modal';

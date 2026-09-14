@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Poktan;
 use App\Models\Saprodi;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,7 @@ class SaprodiController extends Controller
      */
     public function index(Request $request): View
     {
-        $saprodis = Saprodi::query()->when($request->search, fn ($query, $search) => $query->where('name', 'like', "%{$search}%"))->when($request->category, fn ($query, $category) => $query->where('category', $category))->latest()->paginate(100)->withQueryString();
+        $saprodis = Saprodi::query()->with('poktan')->when($request->search, fn ($query, $search) => $query->where('name', 'like', "%{$search}%"))->latest()->paginate(100)->withQueryString();
 
         return view('saprodis.index', compact('saprodis'));
     }
@@ -27,7 +28,7 @@ class SaprodiController extends Controller
     {
         abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
 
-        return view('saprodis.form', ['saprodi' => new Saprodi]);
+        return view('saprodis.form', ['saprodi' => new Saprodi, 'poktans' => Poktan::query()->orderBy('name')->get()]);
     }
 
     /**
@@ -35,6 +36,8 @@ class SaprodiController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Hanya admin yang dapat menambahkan data baru.');
+
         Saprodi::create($this->validated($request));
 
         return redirect()->route('saprodis.index')->with('success', 'Data saprodi berhasil ditambahkan.');
@@ -45,6 +48,8 @@ class SaprodiController extends Controller
      */
     public function show(Saprodi $saprodi): View
     {
+        $saprodi->load('poktan');
+
         return view('saprodis.show', compact('saprodi'));
     }
 
@@ -53,7 +58,9 @@ class SaprodiController extends Controller
      */
     public function edit(Saprodi $saprodi): View
     {
-        return view('saprodis.form', compact('saprodi'));
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Akun Anda hanya dapat melihat data saprodi.');
+
+        return view('saprodis.form', ['saprodi' => $saprodi, 'poktans' => Poktan::query()->orderBy('name')->get()]);
     }
 
     /**
@@ -61,6 +68,8 @@ class SaprodiController extends Controller
      */
     public function update(Request $request, Saprodi $saprodi): RedirectResponse
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403, 'Akun Anda hanya dapat melihat data saprodi.');
+
         $data = $this->validated($request);
         $oldPhotoPath = $saprodi->photo_path;
         $saprodi->update($data);
@@ -89,17 +98,13 @@ class SaprodiController extends Controller
 
     private function validated(Request $request): array
     {
-        $data = $request->validate(['name' => ['required', 'string', 'max:120'], 'category' => ['required', 'in:Pupuk,Benih,Pestisida,Peralatan Pertanian,Lainnya'], 'custom_category' => ['nullable', 'required_if:category,Lainnya', 'string', 'max:120'], 'unit' => ['required', 'string', 'max:40'], 'stock' => ['required', 'numeric', 'min:0'], 'minimum_stock' => ['required', 'numeric', 'min:0'], 'photo' => ['nullable', 'image', 'max:2048'], 'notes' => ['nullable', 'string']]);
-
-        if ($data['category'] === 'Lainnya') {
-            $data['category'] = trim($data['custom_category']);
-        }
+        $data = $request->validate(['name' => ['required', 'string', 'max:120'], 'poktan_id' => ['required', 'exists:poktans,id'], 'unit' => ['required', 'string', 'max:40'], 'quantity_distributed' => ['required', 'numeric', 'min:0'], 'distributed_year' => ['required', 'integer', 'between:1950,'.now()->year], 'photo' => ['nullable', 'image', 'max:2048'], 'notes' => ['nullable', 'string']]);
 
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('saprodi', 'public');
         }
 
-        unset($data['custom_category'], $data['photo']);
+        unset($data['photo']);
 
         return $data;
     }
