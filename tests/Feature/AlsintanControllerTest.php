@@ -7,6 +7,27 @@ use Tests\TestCase;
 
 class AlsintanControllerTest extends TestCase
 {
+    public function test_admin_can_save_an_alsintan_without_an_inventory_number(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->post(route('alsintans.store'), [
+            'type' => 'Cultivator',
+            'brand_type' => 'Honda F300',
+            'district' => 'Melak',
+            'village' => 'Melak Ulu',
+            'procurement_year' => 2026,
+            'condition' => 'Baik',
+            'usage_status' => 'Digunakan',
+        ]);
+
+        $response->assertRedirect(route('alsintans.index'));
+        $this->assertDatabaseHas('alsintans', [
+            'type' => 'Cultivator',
+            'inventory_number' => null,
+        ]);
+    }
+
     public function test_admin_can_save_an_alsintan_google_maps_link(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

@@ -6,10 +6,10 @@
             @if ($poktan->exists) @method('put') @endif
             <div class="form-grid">
                 @foreach (['name' => 'Nama kelompok tani', 'chairperson' => 'Nama ketua', 'district' => 'Kecamatan', 'village' => 'Kampung / desa', 'commodity' => 'Komoditas', 'member_count' => 'Jumlah anggota', 'phone' => 'Nomor kontak'] as $field => $label)
-                    <div class="field"><label>{{ $label }}</label><input name="{{ $field }}" value="{{ old($field, $poktan->$field) }}" {{ $field === 'member_count' ? 'type=number min=0' : ' ' }} required>@error($field)<span class="error">{{ $message }}</span>@enderror</div>
+                    <div class="field"><label>{{ $label }}</label><input name="{{ $field }}" value="{{ old($field, $poktan->$field) }}" placeholder="{{ match($field) { 'name' => 'Contoh: Tani Makmur', 'chairperson' => 'Contoh: Budi Santoso', 'district' => 'Contoh: Melak', 'village' => 'Contoh: Melak Ulu', 'commodity' => 'Contoh: Padi, Jagung, atau Kedelai', 'member_count' => 'Contoh: 25', 'phone' => 'Contoh: 0812-3456-7890', default => '' } }}" {{ $field === 'member_count' ? 'type=number min=0' : ' ' }} required>@error($field)<span class="error">{{ $message }}</span>@enderror</div>
                 @endforeach
                 <div class="field"><label>Status</label><select name="status"><option @selected(old('status', $poktan->status) === 'Aktif')>Aktif</option><option @selected(old('status', $poktan->status) === 'Nonaktif')>Nonaktif</option></select></div>
-                <div class="field full"><label>Alamat</label><textarea name="address">{{ old('address', $poktan->address) }}</textarea></div>
+                <div class="field full"><label>Alamat</label><textarea name="address" placeholder="Contoh: Jl. Pertanian No. 10, Kampung Melak Ulu.">{{ old('address', $poktan->address) }}</textarea></div>
             </div>
             <div class="form-footer"><a class="btn btn-outline" href="{{ route('poktans.index') }}">Batal</a><button class="btn btn-primary">Simpan Data</button></div>
         </form>

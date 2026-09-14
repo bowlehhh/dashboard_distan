@@ -11,6 +11,25 @@ class SaprodiControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_admin_can_save_a_saprodi_without_a_poktan(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->post(route('saprodis.store'), [
+            'name' => 'Pupuk Organik',
+            'unit' => 'Sak',
+            'quantity_distributed' => 25,
+            'distributed_year' => 2026,
+        ]);
+
+        $response->assertRedirect(route('saprodis.index'));
+        $this->assertDatabaseHas('saprodis', [
+            'name' => 'Pupuk Organik',
+            'poktan_id' => null,
+            'quantity_distributed' => 25,
+        ]);
+    }
+
     public function test_admin_can_save_a_saprodi_distribution(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

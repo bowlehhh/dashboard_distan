@@ -15,11 +15,11 @@
             <form method="post" action="{{ route('settings.profile.update') }}" enctype="multipart/form-data" aria-label="Form profil instansi">
                 @csrf @method('put')
                 <div class="form-grid">
-                    <div class="field full"><label for="name">Nama instansi</label><input id="name" name="name" value="{{ old('name', $profile['name']) }}" required></div>
-                    <div class="field"><label for="address">Alamat</label><input id="address" name="address" value="{{ old('address', $profile['address']) }}"></div>
-                    <div class="field"><label for="phone">Telepon</label><input id="phone" name="phone" value="{{ old('phone', $profile['phone']) }}"></div>
-                    <div class="field"><label for="email">Email instansi</label><input id="email" type="email" name="email" value="{{ old('email', $profile['email']) }}"></div>
-                    <div class="field"><label for="logo">Logo instansi (opsional)</label><input id="logo" type="file" name="logo" accept="image/png,image/jpeg,image/webp"></div>
+                    <div class="field full"><label for="name">Nama instansi</label><input id="name" name="name" value="{{ old('name', $profile['name']) }}" placeholder="Contoh: Dinas Pertanian Kabupaten Kutai Barat" required></div>
+                    <div class="field"><label for="address">Alamat</label><input id="address" name="address" value="{{ old('address', $profile['address']) }}" placeholder="Contoh: Jl. Sendawar Raya, Barong Tongkok"></div>
+                    <div class="field"><label for="phone">Telepon</label><input id="phone" name="phone" value="{{ old('phone', $profile['phone']) }}" placeholder="Contoh: (0545) 123456"></div>
+                    <div class="field"><label for="email">Email instansi</label><input id="email" type="email" name="email" value="{{ old('email', $profile['email']) }}" placeholder="Contoh: distan@kutaibaratkab.go.id"></div>
+                    <div class="field"><label for="logo">Logo instansi (opsional)</label><input id="logo" type="file" name="logo" accept="image/png,image/jpeg,image/webp" aria-describedby="logo-hint"><small id="logo-hint">Pilih file PNG, JPG, atau WebP untuk mengganti logo.</small></div>
                 </div>
                 <div class="form-footer"><button class="btn btn-primary">Simpan Profil</button></div>
             </form>
@@ -36,7 +36,7 @@
             <div class="settings-card__action"><p>Backup berformat JSON dan mencakup data operasional serta pengaturan instansi. Akun pengguna tidak termasuk.</p><a class="btn btn-primary" href="{{ route('settings.backup.download') }}">↓ Unduh Backup</a></div>
             <form class="restore-form" method="post" action="{{ route('settings.backup.restore') }}" enctype="multipart/form-data" data-confirm="Pulihkan backup? Data operasional saat ini akan diganti.">
                 @csrf
-                <div class="field"><label for="backup">Pulihkan dari file backup</label><input id="backup" type="file" name="backup" accept="application/json,.json" required></div><button class="btn btn-outline">Pulihkan Data</button>
+                <div class="field"><label for="backup">Pulihkan dari file backup</label><input id="backup" type="file" name="backup" accept="application/json,.json" aria-describedby="backup-hint" required><small id="backup-hint">Pilih file backup SIMANTAP berformat JSON.</small></div><button class="btn btn-outline">Pulihkan Data</button>
             </form>
         </article>
         @endif
@@ -48,7 +48,7 @@
 
         <article class="settings-card" id="keamanan">
             <div class="settings-card__heading"><i>✓</i><div><h2>Keamanan Akun</h2><p>Ganti kata sandi akun Anda sendiri.</p></div></div>
-            <form method="post" action="{{ route('settings.security.update') }}" aria-label="Form keamanan akun" data-security-form>@csrf @method('put')<div class="field"><label for="security-user">Akun Anda</label><input id="security-user" type="text" value="{{ auth()->user()->email }} — {{ auth()->user()->name }}" readonly></div><div class="form-grid"><div class="field full" data-current-password-field><label for="current_password">Kata sandi saat ini</label><input id="current_password" type="password" name="current_password" autocomplete="current-password"></div><div class="field"><label for="password">Kata sandi baru</label><input id="password" type="password" name="password" autocomplete="new-password" required></div><div class="field"><label for="password_confirmation">Konfirmasi kata sandi baru</label><input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required></div></div><label class="settings-checkbox"><input type="checkbox" name="logout_other_sessions" value="1" checked> Akhiri sesi pada perangkat lain</label><div class="form-footer"><button class="btn btn-primary">Perbarui Keamanan</button></div></form>
+            <form method="post" action="{{ route('settings.security.update') }}" aria-label="Form keamanan akun" data-security-form>@csrf @method('put')<div class="field"><label for="security-user">Akun Anda</label><input id="security-user" type="text" value="{{ auth()->user()->email }} — {{ auth()->user()->name }}" placeholder="Akun yang sedang digunakan" readonly></div><div class="form-grid"><div class="field full" data-current-password-field><label for="current_password">Kata sandi saat ini</label><input id="current_password" type="password" name="current_password" placeholder="Masukkan kata sandi saat ini" autocomplete="current-password"></div><div class="field"><label for="password">Kata sandi baru</label><input id="password" type="password" name="password" placeholder="Minimal 8 karakter" autocomplete="new-password" required></div><div class="field"><label for="password_confirmation">Konfirmasi kata sandi baru</label><input id="password_confirmation" type="password" name="password_confirmation" placeholder="Ketik ulang kata sandi baru" autocomplete="new-password" required></div></div><label class="settings-checkbox"><input type="checkbox" name="logout_other_sessions" value="1" checked> Akhiri sesi pada perangkat lain</label><div class="form-footer"><button class="btn btn-primary">Perbarui Keamanan</button></div></form>
         </article>
     </section>
 </x-app-layout>
