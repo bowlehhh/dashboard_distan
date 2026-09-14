@@ -1064,9 +1064,9 @@ body.public-directory{display:block;min-height:0;padding:0!important}
 .landing-notice.is-leaving{opacity:0;transform:translate(-50%,-8px);pointer-events:none;transition:opacity .22s ease,transform .22s ease}
 
 /* One shared crop of the official leaf mark keeps branding identical in every screen. */
-.simantap-mark{display:inline-block;width:1em;height:1em;flex:0 0 auto;background-color:#07531b;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain;vertical-align:middle}
-.app-body .sidebar .brand-mark.simantap-mark{background-color:#004b1c;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
-.page-loader__mark.simantap-mark{background-color:#08723a;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
+.simantap-mark{display:inline-block;width:1em;height:1em;flex:0 0 auto;background-color:transparent;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain;vertical-align:middle}
+.app-body .sidebar .brand-mark.simantap-mark{background-color:transparent;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
+.page-loader__mark.simantap-mark{background-color:transparent;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
 .auth-wordmark__icon{width:62px;height:62px}
 .auth-panel__identity .auth-wordmark__icon{width:53px;height:53px}
 .landing-brand__icon{width:64px;height:64px}
