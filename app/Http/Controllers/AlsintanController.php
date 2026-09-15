@@ -102,7 +102,7 @@ class AlsintanController extends Controller
 
     private function validated(Request $request, ?Alsintan $alsintan = null): array
     {
-        $data = $request->validate(['type' => ['required', 'string', 'max:120'], 'brand_type' => ['required', 'string', 'max:120'], 'inventory_number' => ['nullable', 'string', 'max:80', $this->inventoryNumberRule($alsintan)], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'village' => ['required', 'string', 'max:120'], 'procurement_year' => ['required', 'integer', 'between:1950,'.now()->year], 'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'usage_status' => ['required', 'string', 'max:100'], 'photo' => ['nullable', 'image', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps'], 'notes' => ['nullable', 'string']]);
+        $data = $request->validate(['type' => ['required', 'string', 'max:120'], 'brand_type' => ['required', 'string', 'max:120'], 'inventory_number' => ['nullable', 'string', 'max:80', $this->inventoryNumberRule($alsintan)], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'district' => ['required', 'string', 'max:120'], 'village' => ['required', 'string', 'max:120'], 'procurement_year' => ['required', 'integer', 'between:1950,'.now()->year], 'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'usage_status' => ['required', 'string', 'max:100'], 'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps'], 'notes' => ['nullable', 'string']]);
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('alsintan', 'public');
         }
@@ -113,13 +113,14 @@ class AlsintanController extends Controller
 
     private function validatedFieldUpdate(Request $request): array
     {
-        $data = $request->validate(['condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'photo' => ['nullable', 'image', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps']]);
+        $data = $request->validate(['condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'camera_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps']]);
 
-        if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('alsintan', 'public');
+        if ($request->hasFile('camera_photo') || $request->hasFile('photo')) {
+            $photo = $request->file('camera_photo') ?? $request->file('photo');
+            $data['photo_path'] = $photo->store('alsintan', 'public');
         }
 
-        unset($data['photo']);
+        unset($data['camera_photo'], $data['photo']);
 
         return $data;
     }

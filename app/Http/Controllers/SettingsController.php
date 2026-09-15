@@ -26,7 +26,6 @@ class SettingsController extends Controller
         return view('settings.index', [
             'profile' => $this->setting('profile', $this->defaultProfile()),
             'appearance' => $appearance,
-            'securityUsers' => User::query()->orderBy('name')->get(['id', 'name', 'email', 'role', 'is_active']),
             'dataCounts' => [
                 'poktans' => Poktan::count(),
                 'alsintans' => Alsintan::count(),

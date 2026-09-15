@@ -98,7 +98,7 @@ class SaprodiController extends Controller
 
     private function validated(Request $request): array
     {
-        $data = $request->validate(['name' => ['required', 'string', 'max:120'], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'unit' => ['required', 'string', 'max:40'], 'quantity_distributed' => ['required', 'numeric', 'min:0'], 'distributed_year' => ['required', 'integer', 'between:1950,'.now()->year], 'photo' => ['nullable', 'image', 'max:2048'], 'notes' => ['nullable', 'string']]);
+        $data = $request->validate(['name' => ['required', 'string', 'max:120'], 'poktan_id' => ['nullable', 'exists:poktans,id'], 'unit' => ['required', 'string', 'max:40'], 'quantity_distributed' => ['required', 'numeric', 'min:0'], 'distributed_year' => ['required', 'integer', 'between:1950,'.now()->year], 'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 'notes' => ['nullable', 'string']]);
 
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('saprodi', 'public');

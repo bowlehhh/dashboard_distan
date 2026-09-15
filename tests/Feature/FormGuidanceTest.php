@@ -56,7 +56,11 @@ class FormGuidanceTest extends TestCase
 
         $response = $this->actingAs($penyuluh)->get(route('alsintans.edit', $alsintan));
 
-        $response->assertSee('Ambil foto terbaru yang memperlihatkan kondisi alsintan.')
+        $response->assertSee('name="camera_photo"', false)
+            ->assertSee('capture="environment"', false)
+            ->assertSee('name="photo"', false)
+            ->assertSee('Di smartphone, pilihan ini membuka kamera belakang secara langsung.')
+            ->assertSee('Pilih foto dari HP')
             ->assertSee('Ambil lokasi saat ini atau tempel link Google Maps');
     }
 

@@ -134,6 +134,22 @@ document.querySelectorAll('[data-current-location]').forEach((button) => {
         }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     });
 });
+
+document.querySelectorAll('[data-photo-choice-group]').forEach((group) => {
+    const photoInputs = group.querySelectorAll('[data-photo-choice]');
+
+    photoInputs.forEach((input) => input.addEventListener('change', () => {
+        if (! input.files?.length) {
+            return;
+        }
+
+        photoInputs.forEach((otherInput) => {
+            if (otherInput !== input) {
+                otherInput.value = '';
+            }
+        });
+    }));
+});
 const confirmationModal = document.createElement('div');
 confirmationModal.className = 'confirmation-modal';
 confirmationModal.hidden = true;
@@ -235,27 +251,6 @@ document.addEventListener('keydown', (event) => {
         closeConfirmationModal();
     }
 });
-
-const securityUser = document.querySelector('[data-security-user]');
-const currentPasswordField = document.querySelector('[data-current-password-field]');
-const currentPasswordInput = document.querySelector('#current_password');
-
-const updateSecurityForm = () => {
-    const isCurrentUser = securityUser?.selectedOptions[0]?.dataset.isCurrent === 'true';
-
-    if (! currentPasswordField || ! currentPasswordInput) {
-        return;
-    }
-
-    currentPasswordField.hidden = ! isCurrentUser;
-    currentPasswordInput.required = isCurrentUser;
-    if (! isCurrentUser) {
-        currentPasswordInput.value = '';
-    }
-};
-
-securityUser?.addEventListener('change', updateSecurityForm);
-updateSecurityForm();
 
 const logoutModal = document.querySelector('[data-logout-modal]');
 const logoutDialog = document.querySelector('[data-logout-dialog]');

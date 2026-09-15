@@ -43,10 +43,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/lupa-password', [AuthController::class, 'forgot'])->name('password.request');
     Route::post('/lupa-password', [AuthController::class, 'emailResetLink'])->middleware('throttle:password-email')->name('password.email');
     Route::get('/reset-password/{token}', [AuthController::class, 'reset'])->name('password.reset');
-    Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('password.update');
+    Route::post('/reset-password', [AuthController::class, 'updatePassword'])->middleware('throttle:password-reset')->name('password.update');
 });
 
-Route::middleware(['auth', 'auth.session'])->group(function () {
+Route::middleware(['auth', 'active', 'auth.session'])->group(function () {
     Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('alsintans', AlsintanController::class)->middleware('role:admin,pimpinan,penyuluh');

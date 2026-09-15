@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,6 +71,8 @@ class AuthController extends Controller
         $credentials = $request->validate(['token' => ['required'], 'email' => ['required', 'email'], 'password' => ['required', 'confirmed', 'min:8']]);
         $status = Password::reset($credentials, function (User $user, string $password): void {
             $user->forceFill(['password' => $password, 'remember_token' => Str::random(60)])->save();
+
+            event(new PasswordReset($user));
         });
 
         return $status === Password::PASSWORD_RESET

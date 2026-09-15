@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SimantapAccessTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_dashboard_requires_authentication(): void
     {
         $response = $this->get('/dashboard');
@@ -23,6 +26,17 @@ class SimantapAccessTest extends TestCase
         $response->assertRedirect(route('home'));
         $response->assertSessionHas('page_loader', 'logout');
 
+        $this->assertGuest();
+    }
+
+    public function test_inactive_authenticated_user_is_logged_out_before_accessing_the_application(): void
+    {
+        $user = User::factory()->create(['is_active' => false]);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('email');
         $this->assertGuest();
     }
 }

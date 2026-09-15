@@ -188,34 +188,50 @@ class PublicInformationController extends Controller
     private function chartForPage(bool $isAlsintans, bool $isPoktans, bool $isSaprodis, bool $isCrops): array
     {
         if ($isAlsintans) {
+            $metrics = Alsintan::query()
+                ->selectRaw('count(distinct type) as type_count, count(distinct district) as district_count, count(distinct procurement_year) as year_count')
+                ->firstOrFail();
+
             return [
-                ['label' => 'Jenis alsintan', 'value' => Alsintan::query()->distinct()->count('type')],
-                ['label' => 'Kecamatan', 'value' => Alsintan::query()->distinct()->count('district')],
-                ['label' => 'Tahun diserahkan', 'value' => Alsintan::query()->whereNotNull('procurement_year')->distinct()->count('procurement_year')],
+                ['label' => 'Jenis alsintan', 'value' => (int) $metrics->type_count],
+                ['label' => 'Kecamatan', 'value' => (int) $metrics->district_count],
+                ['label' => 'Tahun diserahkan', 'value' => (int) $metrics->year_count],
             ];
         }
 
         if ($isPoktans) {
+            $metrics = Poktan::query()
+                ->selectRaw('count(distinct case when status = ? then id end) as active_count, count(distinct district) as district_count, count(distinct commodity) as commodity_count', ['Aktif'])
+                ->firstOrFail();
+
             return [
-                ['label' => 'Kelompok tani', 'value' => Poktan::query()->where('status', 'Aktif')->distinct()->count('id')],
-                ['label' => 'Kecamatan', 'value' => Poktan::query()->distinct()->count('district')],
-                ['label' => 'Komoditas', 'value' => Poktan::query()->whereNotNull('commodity')->distinct('commodity')->count('commodity')],
+                ['label' => 'Kelompok tani', 'value' => (int) $metrics->active_count],
+                ['label' => 'Kecamatan', 'value' => (int) $metrics->district_count],
+                ['label' => 'Komoditas', 'value' => (int) $metrics->commodity_count],
             ];
         }
 
         if ($isSaprodis) {
+            $metrics = Saprodi::query()
+                ->selectRaw('count(distinct name) as name_count, count(distinct poktan_id) as recipient_count, count(distinct unit) as unit_count')
+                ->firstOrFail();
+
             return [
-                ['label' => 'Jenis saprodi', 'value' => Saprodi::query()->distinct()->count('name')],
-                ['label' => 'Poktan penerima', 'value' => Saprodi::query()->whereNotNull('poktan_id')->distinct()->count('poktan_id')],
-                ['label' => 'Satuan', 'value' => Saprodi::query()->whereNotNull('unit')->distinct('unit')->count('unit')],
+                ['label' => 'Jenis saprodi', 'value' => (int) $metrics->name_count],
+                ['label' => 'Poktan penerima', 'value' => (int) $metrics->recipient_count],
+                ['label' => 'Satuan', 'value' => (int) $metrics->unit_count],
             ];
         }
 
         if ($isCrops) {
+            $metrics = Crop::query()
+                ->selectRaw('count(distinct commodity) as commodity_count, count(distinct district) as district_count, count(distinct period) as period_count')
+                ->firstOrFail();
+
             return [
-                ['label' => 'Komoditas', 'value' => Crop::query()->whereNotNull('commodity')->distinct('commodity')->count('commodity')],
-                ['label' => 'Kecamatan', 'value' => Crop::query()->distinct()->count('district')],
-                ['label' => 'Panen', 'value' => Crop::query()->whereNotNull('period')->distinct('period')->count('period')],
+                ['label' => 'Komoditas', 'value' => (int) $metrics->commodity_count],
+                ['label' => 'Kecamatan', 'value' => (int) $metrics->district_count],
+                ['label' => 'Panen', 'value' => (int) $metrics->period_count],
             ];
         }
 

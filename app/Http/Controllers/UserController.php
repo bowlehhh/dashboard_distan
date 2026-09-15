@@ -56,7 +56,13 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
-        $user->update($this->validated($request, $user));
+        $validated = $this->validated($request, $user);
+
+        if ($this->wouldRemoveLastActiveAdmin($user, $validated)) {
+            return back()->with('error', 'Minimal satu akun admin aktif harus tetap tersedia.');
+        }
+
+        $user->update($validated);
 
         return redirect()->route('users.index')->with('success', 'Pengguna diperbarui.');
     }
@@ -69,6 +75,11 @@ class UserController extends Controller
         if ($user->is(request()->user())) {
             return back()->with('error', 'Akun sendiri tidak dapat dihapus.');
         }
+
+        if ($user->hasRole('admin') && $user->is_active && ! User::query()->whereKeyNot($user->getKey())->where('role', 'admin')->where('is_active', true)->exists()) {
+            return back()->with('error', 'Admin aktif terakhir tidak dapat dihapus.');
+        }
+
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'Pengguna dihapus.');
@@ -82,5 +93,18 @@ class UserController extends Controller
         }
 
         return $request->validate($rules);
+    }
+
+    /** @param array<string, mixed> $attributes */
+    private function wouldRemoveLastActiveAdmin(User $user, array $attributes): bool
+    {
+        if (! $user->hasRole('admin') || ! $user->is_active) {
+            return false;
+        }
+
+        $removesActiveAdminAccess = $attributes['role'] !== 'admin' || ! (bool) $attributes['is_active'];
+
+        return $removesActiveAdminAccess
+            && ! User::query()->whereKeyNot($user->getKey())->where('role', 'admin')->where('is_active', true)->exists();
     }
 }

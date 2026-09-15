@@ -34,44 +34,60 @@ class PageRecommendationProvider
     /** @return array<int, array{title: string, value: string, description: string}> */
     private function alsintanCards(): array
     {
+        $counts = Alsintan::query()
+            ->select('condition')
+            ->selectRaw('count(*) as total')
+            ->groupBy('condition')
+            ->pluck('total', 'condition');
+
         return [
-            ['title' => 'Kondisi Baik', 'value' => (string) Alsintan::query()->where('condition', 'Baik')->count(), 'description' => 'Unit yang siap digunakan untuk kegiatan pertanian.'],
-            ['title' => 'Rusak Ringan', 'value' => (string) Alsintan::query()->where('condition', 'Rusak Ringan')->count(), 'description' => 'Unit yang perlu perawatan atau perbaikan ringan.'],
-            ['title' => 'Rusak Berat', 'value' => (string) Alsintan::query()->where('condition', 'Rusak Berat')->count(), 'description' => 'Unit yang perlu ditindaklanjuti dengan perbaikan menyeluruh.'],
+            ['title' => 'Kondisi Baik', 'value' => (string) ($counts['Baik'] ?? 0), 'description' => 'Unit yang siap digunakan untuk kegiatan pertanian.'],
+            ['title' => 'Rusak Ringan', 'value' => (string) ($counts['Rusak Ringan'] ?? 0), 'description' => 'Unit yang perlu perawatan atau perbaikan ringan.'],
+            ['title' => 'Rusak Berat', 'value' => (string) ($counts['Rusak Berat'] ?? 0), 'description' => 'Unit yang perlu ditindaklanjuti dengan perbaikan menyeluruh.'],
         ];
     }
 
     /** @return array<int, array{title: string, value: string, description: string}> */
     private function saprodiCards(): array
     {
-        $latestYear = Saprodi::query()->max('distributed_year');
+        $metrics = Saprodi::query()
+            ->selectRaw('max(distributed_year) as latest_year, count(distinct poktan_id) as recipient_count, count(*) as total')
+            ->firstOrFail();
+        $latestYear = $metrics->latest_year;
 
         return [
             ['title' => 'Tahun Penyerahan Terbaru', 'value' => $latestYear ? (string) $latestYear : '—', 'description' => $latestYear ? 'Data penyerahan saprodi paling baru tercatat pada tahun '.$latestYear.'.' : 'Belum ada data tahun penyerahan saprodi.'],
-            ['title' => 'Poktan Penerima', 'value' => (string) Saprodi::query()->whereNotNull('poktan_id')->distinct('poktan_id')->count('poktan_id'), 'description' => 'Jumlah kelompok tani yang menerima saprodi.'],
-            ['title' => 'Total Jenis Saprodi', 'value' => (string) Saprodi::query()->count(), 'description' => 'Jumlah data saprodi yang telah diserahkan.'],
+            ['title' => 'Poktan Penerima', 'value' => (string) $metrics->recipient_count, 'description' => 'Jumlah kelompok tani yang menerima saprodi.'],
+            ['title' => 'Total Jenis Saprodi', 'value' => (string) $metrics->total, 'description' => 'Jumlah data saprodi yang telah diserahkan.'],
         ];
     }
 
     /** @return array<int, array{title: string, value: string, description: string}> */
     private function cropCards(): array
     {
-        $latestPeriod = Crop::query()->max('period');
+        $metrics = Crop::query()
+            ->selectRaw('max(period) as latest_period, sum(planted_area) as planted_area, sum(harvested_area) as harvested_area')
+            ->firstOrFail();
+        $latestPeriod = $metrics->latest_period;
 
         return [
             ['title' => 'Periode Terbaru', 'value' => $latestPeriod ? (string) $latestPeriod : '—', 'description' => $latestPeriod ? 'Realisasi tanam dan panen terakhir pada periode '.$latestPeriod.'.' : 'Belum ada periode tanaman pangan yang tercatat.'],
-            ['title' => 'Total Luas Tanam', 'value' => $this->formatArea((float) Crop::query()->sum('planted_area')), 'description' => 'Akumulasi luas tanam dari seluruh data komoditas.'],
-            ['title' => 'Total Luas Panen', 'value' => $this->formatArea((float) Crop::query()->sum('harvested_area')), 'description' => 'Akumulasi luas panen dari seluruh data komoditas.'],
+            ['title' => 'Total Luas Tanam', 'value' => $this->formatArea((float) $metrics->planted_area), 'description' => 'Akumulasi luas tanam dari seluruh data komoditas.'],
+            ['title' => 'Total Luas Panen', 'value' => $this->formatArea((float) $metrics->harvested_area), 'description' => 'Akumulasi luas panen dari seluruh data komoditas.'],
         ];
     }
 
     /** @return array<int, array{title: string, value: string, description: string}> */
     private function poktanCards(): array
     {
+        $metrics = Poktan::query()
+            ->selectRaw('sum(case when status = ? then 1 else 0 end) as active_count, sum(case when status = ? then 1 else 0 end) as inactive_count, count(distinct district) as district_count', ['Aktif', 'Nonaktif'])
+            ->firstOrFail();
+
         return [
-            ['title' => 'Poktan Aktif', 'value' => (string) Poktan::query()->where('status', 'Aktif')->count(), 'description' => 'Kelompok tani yang berstatus aktif.'],
-            ['title' => 'Poktan Nonaktif', 'value' => (string) Poktan::query()->where('status', 'Nonaktif')->count(), 'description' => 'Kelompok tani yang perlu pemutakhiran status.'],
-            ['title' => 'Kecamatan Terjangkau', 'value' => (string) Poktan::query()->distinct('district')->count('district'), 'description' => 'Jumlah kecamatan yang memiliki data kelompok tani.'],
+            ['title' => 'Poktan Aktif', 'value' => (string) ($metrics->active_count ?? 0), 'description' => 'Kelompok tani yang berstatus aktif.'],
+            ['title' => 'Poktan Nonaktif', 'value' => (string) ($metrics->inactive_count ?? 0), 'description' => 'Kelompok tani yang perlu pemutakhiran status.'],
+            ['title' => 'Kecamatan Terjangkau', 'value' => (string) $metrics->district_count, 'description' => 'Jumlah kecamatan yang memiliki data kelompok tani.'],
         ];
     }
 

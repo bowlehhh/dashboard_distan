@@ -21,6 +21,9 @@ class SettingsControllerTest extends TestCase
 
         $response->assertSee('Profil Instansi');
         $response->assertDontSee('Notifikasi');
+        $response->assertSee('name="user_id" value="'.$admin->id.'"', false);
+        $response->assertSee('name="current_password"', false);
+        $response->assertSee('autocomplete="current-password" required', false);
     }
 
     public function test_pimpinan_cannot_access_settings(): void
