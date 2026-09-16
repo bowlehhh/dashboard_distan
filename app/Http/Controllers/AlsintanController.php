@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules\Unique;
 
 class AlsintanController extends Controller
 {
+    private const FIELD_PHOTO_MAX_KILOBYTES = 60 * 1024;
+
     /**
      * Display a listing of the resource.
      */
@@ -127,7 +129,19 @@ class AlsintanController extends Controller
 
     private function validatedFieldUpdate(Request $request): array
     {
-        $data = $request->validate(['condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'], 'camera_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps']]);
+        $fieldPhotoRules = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:'.self::FIELD_PHOTO_MAX_KILOBYTES];
+
+        $data = $request->validate([
+            'condition' => ['required', 'in:Baik,Rusak Ringan,Rusak Berat'],
+            'camera_photo' => $fieldPhotoRules,
+            'photo' => $fieldPhotoRules,
+            'google_maps_url' => ['nullable', 'url', 'max:2048', 'starts_with:https://www.google.com/maps,https://maps.google.com,https://maps.app.goo.gl,https://goo.gl/maps'],
+        ], [
+            'camera_photo.max' => 'Ukuran foto dari kamera tidak boleh lebih dari 60 MB.',
+            'camera_photo.uploaded' => 'Foto dari kamera gagal diunggah. Pastikan ukurannya tidak lebih dari 60 MB.',
+            'photo.max' => 'Ukuran foto dari HP tidak boleh lebih dari 60 MB.',
+            'photo.uploaded' => 'Foto dari HP gagal diunggah. Pastikan ukurannya tidak lebih dari 60 MB.',
+        ]);
 
         if ($request->hasFile('camera_photo') || $request->hasFile('photo')) {
             $photo = $request->file('camera_photo') ?? $request->file('photo');

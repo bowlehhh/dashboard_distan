@@ -11,6 +11,8 @@ use Illuminate\Contracts\View\View;
 
 class PublicInformationController extends Controller
 {
+    private const PUBLIC_ROWS_PER_PAGE = 8;
+
     public function poktans(): View
     {
         $activePoktans = Poktan::query()->where('status', 'Aktif');
@@ -19,16 +21,15 @@ class PublicInformationController extends Controller
         $rows = (clone $activePoktans)
             ->select(['name', 'district', 'commodity', 'member_count', 'status'])
             ->orderBy('name')
-            ->limit(12)
-            ->get()
-            ->map(fn (Poktan $poktan): array => [
-                $poktan->name,
-                $poktan->district,
-                $poktan->commodity,
-                number_format($poktan->member_count).' anggota',
-                $poktan->status,
-            ])
-            ->all();
+            ->paginate(self::PUBLIC_ROWS_PER_PAGE);
+
+        $rows->getCollection()->transform(fn (Poktan $poktan): array => [
+            $poktan->name,
+            $poktan->district,
+            $poktan->commodity,
+            number_format($poktan->member_count).' anggota',
+            $poktan->status,
+        ]);
 
         return $this->page(
             title: 'Data Kelompok Tani',
@@ -47,7 +48,7 @@ class PublicInformationController extends Controller
         $rows = Alsintan::query()
             ->select(['type', 'brand_type', 'district', 'procurement_year'])
             ->orderBy('type')
-            ->paginate(4);
+            ->paginate(self::PUBLIC_ROWS_PER_PAGE);
 
         $rows->getCollection()->transform(fn (Alsintan $alsintan): array => [
             $alsintan->type,
@@ -73,16 +74,15 @@ class PublicInformationController extends Controller
             ->with('poktan:id,name')
             ->select(['name', 'poktan_id', 'quantity_distributed', 'unit', 'distributed_year'])
             ->orderBy('name')
-            ->limit(12)
-            ->get()
-            ->map(fn (Saprodi $saprodi): array => [
-                $saprodi->name,
-                $saprodi->poktan?->name ?? '—',
-                number_format((float) $saprodi->quantity_distributed, 0, ',', '.'),
-                $saprodi->unit,
-                $saprodi->distributed_year ?? '—',
-            ])
-            ->all();
+            ->paginate(self::PUBLIC_ROWS_PER_PAGE);
+
+        $rows->getCollection()->transform(fn (Saprodi $saprodi): array => [
+            $saprodi->name,
+            $saprodi->poktan?->name ?? '—',
+            number_format((float) $saprodi->quantity_distributed, 0, ',', '.'),
+            $saprodi->unit,
+            $saprodi->distributed_year ?? '—',
+        ]);
 
         return $this->page(
             title: 'Data Saprodi',
@@ -99,17 +99,16 @@ class PublicInformationController extends Controller
         $rows = Crop::query()
             ->select(['commodity', 'district', 'planted_area', 'harvested_area', 'production', 'period'])
             ->orderBy('commodity')
-            ->limit(12)
-            ->get()
-            ->map(fn (Crop $crop): array => [
-                $crop->commodity,
-                $crop->district,
-                number_format((float) $crop->planted_area, 0, ',', '.').' ha',
-                number_format((float) $crop->harvested_area, 0, ',', '.').' ha',
-                $crop->production,
-                $crop->period,
-            ])
-            ->all();
+            ->paginate(self::PUBLIC_ROWS_PER_PAGE);
+
+        $rows->getCollection()->transform(fn (Crop $crop): array => [
+            $crop->commodity,
+            $crop->district,
+            number_format((float) $crop->planted_area, 0, ',', '.').' ha',
+            number_format((float) $crop->harvested_area, 0, ',', '.').' ha',
+            $crop->production,
+            $crop->period,
+        ]);
 
         return $this->page(
             title: 'Tanaman Pangan',

@@ -61,6 +61,7 @@ class FormGuidanceTest extends TestCase
             ->assertSee('name="photo"', false)
             ->assertSee('Di smartphone, pilihan ini membuka kamera belakang secara langsung.')
             ->assertSee('Pilih foto dari HP')
+            ->assertSee('Ukuran maksimal 60 MB.')
             ->assertSee('Ambil lokasi saat ini atau tempel link Google Maps');
     }
 

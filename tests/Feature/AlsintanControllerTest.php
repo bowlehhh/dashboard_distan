@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AlsintanControllerTest extends TestCase
@@ -85,7 +86,7 @@ class AlsintanControllerTest extends TestCase
 
         $response = $this->actingAs($penyuluh)->put(route('alsintans.update', $alsintan), [
             'condition' => 'Rusak Ringan',
-            'camera_photo' => UploadedFile::fake()->image('foto-kamera.jpg')->size(500),
+            'camera_photo' => UploadedFile::fake()->image('foto-kamera.jpg')->size(60 * 1024),
         ]);
 
         $response->assertRedirect(route('alsintans.index'));
@@ -102,12 +103,44 @@ class AlsintanControllerTest extends TestCase
 
         $response = $this->actingAs($penyuluh)->put(route('alsintans.update', $alsintan), [
             'condition' => 'Baik',
-            'photo' => UploadedFile::fake()->image('foto-galeri.png')->size(500),
+            'photo' => UploadedFile::fake()->image('foto-galeri.png')->size(60 * 1024),
         ]);
 
         $response->assertRedirect(route('alsintans.index'));
         $this->assertNotNull($alsintan->refresh()->photo_path);
         Storage::disk('public')->assertExists($alsintan->photo_path);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function fieldPhotoInputs(): array
+    {
+        return [
+            'foto kamera' => ['camera_photo'],
+            'foto galeri HP' => ['photo'],
+        ];
+    }
+
+    #[DataProvider('fieldPhotoInputs')]
+    public function test_penyuluh_cannot_upload_an_alsintan_photo_larger_than_sixty_megabytes(string $photoInput): void
+    {
+        Storage::fake('public');
+        $penyuluh = User::factory()->create(['role' => 'penyuluh']);
+        $alsintan = $this->createAlsintan();
+
+        $response = $this->from(route('alsintans.edit', $alsintan))
+            ->actingAs($penyuluh)
+            ->put(route('alsintans.update', $alsintan), [
+                'condition' => 'Rusak Berat',
+                $photoInput => UploadedFile::fake()->image('foto-terlalu-besar.jpg')->size((60 * 1024) + 1),
+            ]);
+
+        $response->assertRedirect(route('alsintans.edit', $alsintan))
+            ->assertSessionHasErrors($photoInput);
+        $this->assertSame('Baik', $alsintan->refresh()->condition);
+        $this->assertNull($alsintan->photo_path);
+        $this->assertSame([], Storage::disk('public')->allFiles());
     }
 
     private function createAlsintan(): Alsintan
