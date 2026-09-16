@@ -40,7 +40,10 @@ class DashboardControllerTest extends TestCase
             ->assertSee('INV-001')
             ->assertSee('2026')
             ->assertSee('Digunakan')
-            ->assertSee('https://maps.app.goo.gl/ExampleLocation')
+            ->assertSee('href="https://maps.app.goo.gl/ExampleLocation"', false)
+            ->assertSee('target="_blank"', false)
+            ->assertSee('rel="noopener noreferrer"', false)
+            ->assertSee('Buka Google Maps')
             ->assertSee('Tahun Diserahkan')
             ->assertDontSee('Detail Informasi')
             ->assertDontSee('>Data Input<', false);
@@ -164,6 +167,25 @@ class DashboardControllerTest extends TestCase
             ->assertDontSee('Detail Informasi')
             ->assertDontSee('Ketua')
             ->assertDontSee('Anggota');
+    }
+
+    public function test_dashboard_does_not_render_a_google_maps_link_for_data_without_coordinates(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+        Poktan::query()->create([
+            'name' => 'Suka Maju',
+            'chairperson' => 'Joko Santoso',
+            'district' => 'Barong Tongkok',
+            'village' => 'Geleo Baru',
+            'commodity' => 'Padi',
+            'member_count' => 28,
+            'status' => 'Aktif',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertSee('Suka Maju')
+            ->assertDontSee('Buka Google Maps');
     }
 
     public function test_dashboard_hides_action_links_for_penyuluh_users(): void

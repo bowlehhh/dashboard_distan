@@ -259,6 +259,11 @@ h1{margin:0;font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
     .app-body .page-recommendations__grid{grid-template-columns:1fr}
 }
 
+.map-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border:1px solid #a9d4b3;border-radius:8px;color:#075c35;background:#edf8ef;font-size:11px;font-weight:800;line-height:1.25;white-space:nowrap;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease}
+.map-link:hover{border-color:#137744;color:#fff;background:#137744;transform:translateY(-1px);box-shadow:0 4px 10px #073e0426}
+.map-link:focus-visible{outline:3px solid #8fd19e;outline-offset:2px}
+.map-link span{font-size:14px;line-height:1}
+
 .directory-year-cards .directory-recommendations__grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .directory-year-card{min-width:0}
 .directory-year-card .directory-recommendation__icon{background:#e7f3e7;color:#17763c}

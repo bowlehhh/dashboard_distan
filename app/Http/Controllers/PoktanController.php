@@ -14,8 +14,14 @@ class PoktanController extends Controller
      */
     public function index(Request $request): View
     {
+        $search = $request->string('search')->trim()->toString();
+
         $poktans = Poktan::query()
-            ->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('name', 'like', "%{$search}%")->orWhere('chairperson', 'like', "%{$search}%")))
+            ->when($search !== '', fn ($query) => $query->whereAny(
+                ['name', 'chairperson', 'district', 'village', 'commodity', 'phone'],
+                'like',
+                "%{$search}%",
+            ))
             ->when($request->district, fn ($query, $district) => $query->where('district', $district))
             ->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))
             ->when($request->status, fn ($query, $status) => $query->where('status', $status))->latest()->paginate(100)->withQueryString();

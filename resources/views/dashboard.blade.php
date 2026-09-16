@@ -17,7 +17,7 @@
 @case('poktan'){{ $item['poktan'] }}@break
 @case('commodity'){{ $item['commodity'] }}@break
 @case('field'){{ $item['columns'][$column['field']] ?? '—' }}@break
-@case('coordinates')@if($item['coordinates'])<a href="{{ $item['coordinates'] }}" target="_blank" rel="noopener noreferrer">Buka Google Maps</a>@else—@endif @break
+@case('coordinates')@if($item['coordinates'])<a class="map-link" href="{{ $item['coordinates'] }}" target="_blank" rel="noopener noreferrer" aria-label="Buka lokasi {{ $item['name'] }} di Google Maps">Buka Google Maps <span aria-hidden="true">↗</span></a>@else—@endif @break
 @case('status')<x-badge :value="$item['status']"/>@break
 @case('photo')@if($item['photo'])<a href="{{ $item['photo'] }}" target="_blank" rel="noreferrer"><img class="table-photo" src="{{ $item['photo'] }}" alt="Foto {{ $item['name'] }}"></a>@else<span class="table-photo-empty">—</span>@endif @break
 @case('actions')@if($item['show_url'] || $item['edit_url'])<div class="row-actions">@if($item['show_url'])<a class="action" href="{{ $item['show_url'] }}" title="Lihat detail">⌕</a>@endif

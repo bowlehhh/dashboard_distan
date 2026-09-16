@@ -18,7 +18,21 @@ class AlsintanController extends Controller
      */
     public function index(Request $request): View
     {
-        $alsintans = Alsintan::with('poktan')->when($request->search, fn ($query, $search) => $query->where(fn ($q) => $q->where('type', 'like', "%{$search}%")->orWhere('brand_type', 'like', "%{$search}%")->orWhere('inventory_number', 'like', "%{$search}%")))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest()->paginate(100)->withQueryString();
+        $search = $request->string('search')->trim()->toString();
+
+        $alsintans = Alsintan::query()
+            ->with('poktan')
+            ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search): void {
+                $query->whereAny(
+                    ['type', 'brand_type', 'inventory_number', 'district', 'village', 'condition', 'usage_status'],
+                    'like',
+                    "%{$search}%",
+                )->orWhereHas('poktan', fn ($query) => $query->where('name', 'like', "%{$search}%"));
+            }))
+            ->when($request->district, fn ($query, $district) => $query->where('district', $district))
+            ->latest()
+            ->paginate(100)
+            ->withQueryString();
 
         return view('alsintans.index', compact('alsintans'));
     }

@@ -36,6 +36,16 @@ class ExcelReportExporterTest extends TestCase
             $this->assertStringContainsString('ALS-001', $worksheet);
             $this->assertStringContainsString('Pompa Air', $worksheet);
             $this->assertStringNotContainsString('tableParts', $worksheet);
+            $autoFilterPosition = mb_strpos($worksheet, '<autoFilter');
+            $mergeCellsPosition = mb_strpos($worksheet, '<mergeCells');
+
+            $this->assertIsInt($autoFilterPosition);
+            $this->assertIsInt($mergeCellsPosition);
+            $this->assertLessThan(
+                $mergeCellsPosition,
+                $autoFilterPosition,
+                'SpreadsheetML requires autoFilter to appear before mergeCells.',
+            );
             $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $response->headers->get('Content-Type'));
             $this->assertSame((string) filesize($path), $response->headers->get('Content-Length'));
         } finally {

@@ -16,7 +16,17 @@ class SaprodiController extends Controller
      */
     public function index(Request $request): View
     {
-        $saprodis = Saprodi::query()->with('poktan')->when($request->search, fn ($query, $search) => $query->where('name', 'like', "%{$search}%"))->latest()->paginate(100)->withQueryString();
+        $search = $request->string('search')->trim()->toString();
+
+        $saprodis = Saprodi::query()
+            ->with('poktan')
+            ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search): void {
+                $query->whereAny(['name', 'unit', 'notes'], 'like', "%{$search}%")
+                    ->orWhereHas('poktan', fn ($query) => $query->where('name', 'like', "%{$search}%"));
+            }))
+            ->latest()
+            ->paginate(100)
+            ->withQueryString();
 
         return view('saprodis.index', compact('saprodis'));
     }

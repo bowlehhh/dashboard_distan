@@ -14,7 +14,18 @@ class CropController extends Controller
      */
     public function index(Request $request): View
     {
-        $crops = Crop::query()->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))->when($request->district, fn ($query, $district) => $query->where('district', $district))->latest('period')->paginate(100)->withQueryString();
+        $search = $request->string('search')->trim()->toString();
+        $crops = Crop::query()
+            ->when($search !== '', fn ($query) => $query->whereAny(
+                ['commodity', 'district', 'production', 'period', 'notes'],
+                'like',
+                "%{$search}%",
+            ))
+            ->when($request->commodity, fn ($query, $commodity) => $query->where('commodity', $commodity))
+            ->when($request->district, fn ($query, $district) => $query->where('district', $district))
+            ->latest('period')
+            ->paginate(100)
+            ->withQueryString();
         $summary = Crop::query()->selectRaw('commodity, sum(planted_area) as planted_area, sum(harvested_area) as harvested_area')->groupBy('commodity')->orderByDesc('planted_area')->get();
 
         return view('crops.index', compact('crops', 'summary'));

@@ -89,7 +89,8 @@ class ExcelReportExporter
             $xml .= '<row r="'.($index + 5).'" ht="21" customHeight="1">'.$this->cells($row, $index + 5, $index % 2 === 0 ? 3 : 4).'</row>';
         }
 
-        return $xml.'</sheetData><mergeCells count="2"><mergeCell ref="A1:'.$lastColumn.'1"/><mergeCell ref="A2:'.$lastColumn.'2"/></mergeCells><autoFilter ref="A4:'.$lastColumn.$lastRow.'"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>';
+        // CT_Worksheet requires autoFilter before mergeCells. Excel for Windows repairs files when this order is reversed.
+        return $xml.'</sheetData><autoFilter ref="A4:'.$lastColumn.$lastRow.'"/><mergeCells count="2"><mergeCell ref="A1:'.$lastColumn.'1"/><mergeCell ref="A2:'.$lastColumn.'2"/></mergeCells><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>';
     }
 
     /** @param array<int, string|int|float|null> $values */
