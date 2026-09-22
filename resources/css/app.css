@@ -1068,6 +1068,36 @@ body.public-directory{display:block;min-height:0;padding:0!important}
 /* Temporary success notices should not remain over the landing page. */
 .landing-notice.is-leaving{opacity:0;transform:translate(-50%,-8px);pointer-events:none;transition:opacity .22s ease,transform .22s ease}
 
+/* Keep public data tables wide, aligned, and readable when the directory contains many rows. */
+.public-directory .directory-data-grid{grid-template-columns:minmax(0,1fr)}
+.public-directory .directory-table-column,
+.public-directory .directory-table-stage,
+.public-directory .directory-table-wrap{width:100%;min-width:0}
+.public-directory .directory-table-column{display:flex;flex-direction:column;gap:18px}
+.public-directory .directory-table-stage{display:block;position:relative}
+.public-directory .directory-table-wrap{overflow-x:auto;overscroll-behavior-x:contain}
+.public-directory .directory-table{min-width:760px}
+.public-directory .directory-table th{line-height:1.35;white-space:normal}
+.public-directory .directory-table td{line-height:1.45;vertical-align:middle}
+.public-directory .directory-pagination{width:100%;justify-content:center}
+.public-directory .directory-chart-card{width:min(100%,360px);justify-self:end}
+
+@media(min-width:851px){
+    .public-directory .directory-table-art{position:absolute;z-index:2;top:50%;width:88px;height:260px;min-height:0;overflow:visible;pointer-events:none;transform:translateY(-50%)}
+    .public-directory .directory-table-art--left{right:calc(100% + 38px);left:auto}
+    .public-directory .directory-table-art--right{right:auto;left:calc(100% + 38px)}
+}
+
+@media(max-width:850px){
+    .public-directory .directory-table-art{display:none}
+    .public-directory .directory-chart-card{justify-self:center}
+}
+
+@media(max-width:600px){
+    .public-directory .directory-table{min-width:680px}
+    .public-directory .directory-chart-card{width:100%;max-width:none}
+}
+
 /* One shared crop of the official leaf mark keeps branding identical in every screen. */
 .simantap-mark{display:inline-block;width:1em;height:1em;flex:0 0 auto;background-color:transparent;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain;vertical-align:middle}
 .app-body .sidebar .brand-mark.simantap-mark{background-color:transparent;background-image:url('/images/simantap-mark-transparent.png');background-position:center;background-repeat:no-repeat;background-size:contain}
